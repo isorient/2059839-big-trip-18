@@ -7,7 +7,7 @@ import PointView from '../view/point-view.js';
 export default class TripPresenter {
   pointListComponent = new PointListView();
 
-  init = (tripContainer) => {
+  init(tripContainer) {
     render(new SortView(), tripContainer);
     render(this.pointListComponent, tripContainer);
     render(new PointEditView(), this.pointListComponent.getElement(), 'AFTERBEGIN');
@@ -15,5 +15,5 @@ export default class TripPresenter {
     for (let i = 0; i < 3; i++) {
       render(new PointView(), this.pointListComponent.getElement());
     }
-  };
+  }
 }
