@@ -1,7 +1,9 @@
-import {getOffersList} from '../chmock/offers.js';
+import getOffersList from '../chmock/offers.js';
 
 export default class OffersModel {
-  offers = getOffersList();
+  #offers = getOffersList();
 
-  getOffers = () => this.offers;
+  get offers() {
+    return this.#offers;
+  }
 }

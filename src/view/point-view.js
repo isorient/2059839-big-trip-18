@@ -95,26 +95,33 @@ const createPointTemplate = (point, offersData, destinationData) => {
   );
 };
 
-export default class PointView {
+class PointView {
+  #element;
+  #point;
+  #offersData;
+  #destinationData;
+
   constructor(point, offersData, destinationData) {
-    this.point = point;
-    this.offersData = offersData;
-    this.destinationData = destinationData;
+    this.#point = point;
+    this.#offersData = offersData;
+    this.#destinationData = destinationData;
   }
 
-  getTemplate() {
-    return createPointTemplate(this.point, this.offersData, this.destinationData);
+  get template() {
+    return createPointTemplate(this.#point, this.#offersData, this.#destinationData);
   }
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
+  get element() {
+    if (!this.#element) {
+      this.#element = createElement(this.template);
     }
 
-    return this.element;
+    return this.#element;
   }
 
   removeElement() {
-    this.element = null;
+    this.#element = null;
   }
 }
+
+export default PointView;

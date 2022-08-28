@@ -26,9 +26,9 @@ const photosDescriptionList = [
   'I would sell my very soul And not regret it for to live without your love'
 ];
 
-const createDestination = (i) => (
+const createDestination = (index) => (
   {
-    'id': i,
+    'id': index,
     'description': destinationsDescriptionList[getRandomInteger(0, destinationsDescriptionList.length - 1)],
     'name': destinationNameList[ getRandomInteger(0, destinationNameList.length - 1) ],
     'pictures': [

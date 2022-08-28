@@ -10,6 +10,11 @@ const POINT_TYPES = [
   'restaurant'
 ];
 
+const DESTINATIONS = [
+  ''
+];
+
 export {
-  POINT_TYPES
+  POINT_TYPES,
+  DESTINATIONS
 };
