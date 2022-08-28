@@ -46,7 +46,13 @@ const getSelectedOffers = (point, offersData) => {
 };
 
 const getEventDate = (startDate) => (`<time class="event__date" datetime="${startDate}">${getPrettyDate(startDate)}</time>`);
-const getEventIcon = (eventType) => (`<img class="event__type-icon" width="42" height="42" src="img/icons/${eventType}.png" alt="Event type icon"></img>`);
+
+const getEventIcon = (eventType) => (
+  `<div class="event__type">
+    <img class="event__type-icon" width="42" height="42" src="img/icons/${eventType}.png" alt="Event type icon"></img>
+  </div>`
+);
+
 const getEventTitle = (eventType, eventDestination) => (`<h3 class="event__title">${eventType} ${eventDestination}</h3>`);
 
 const getEventPrice = (eventBasePrice) => (
@@ -70,6 +76,12 @@ const getFavoriteButton = (isFavorite) => {
   );
 };
 
+const getRollupButton = () => (
+  `<button class="event__rollup-btn" type="button">
+    <span class="visually-hidden">Open event</span>
+  </button>`
+);
+
 const createPointTemplate = (point, offersData, destinationData) => {
   const destination = destinationData.find( (el) => el.id === point.destination);
 
@@ -77,20 +89,14 @@ const createPointTemplate = (point, offersData, destinationData) => {
     `<li class="trip-events__item">
     <div class="event">
       ${getEventDate(point.dateFrom)}
-      <div class="event__type">
-        ${getEventIcon(point.type)}
-      </div>
+      ${getEventIcon(point.type)}
       ${getEventTitle(point.type, destination.name)}
       ${getEventSchedule(point.dateFrom, point.dateTo)}
       ${getEventPrice(point.basePrice)}
       
       ${getSelectedOffers(point, offersData)}
       ${getFavoriteButton(point.isFavorite)}
-      
-      <button class="event__rollup-btn" type="button">
-        <span class="visually-hidden">Open event</span>
-      </button>
-    </div>
+      ${getRollupButton()}
   </li>`
   );
 };

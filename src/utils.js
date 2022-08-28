@@ -12,15 +12,6 @@ const getRandomInteger = (a = 0, b = 1) => {
   return Math.floor(lower + Math.random() * (upper - lower + 1));
 };
 
-const getPrettyNumber = (number) => {
-  if (number.toString().length === 1) {
-    number = `0${number}`;
-  }
-  return number;
-};
-
-const createDatetime = () => `${getRandomInteger(1000, 3000)}-${getPrettyNumber(getRandomInteger(1, 12))}-${getPrettyNumber(getRandomInteger(1, 30))}T${getPrettyNumber(getRandomInteger(0, 23))}:${getPrettyNumber(getRandomInteger(0, 59))}:${getPrettyNumber(getRandomInteger(0, 59))}.${getPrettyNumber(getRandomInteger(0, 999))}Z`;
-
 const getPrettyDate = (eventPeriod) => dayjs(eventPeriod).format('MMM D');
 const getPrettyTime = (eventPeriod) => dayjs(eventPeriod).format('HH:mm');
 const getPrettyDatetime = (eventPeriod) => dayjs(eventPeriod).format('DD/MM/YY HH:mm');
@@ -38,11 +29,13 @@ const getDatetimeDuration = (startPeriod, endPeriod) => {
   return datetimeDuration.format(outputFormat);
 };
 
+const isEscPressed = (evt) => evt.key === 'Escape' || evt.key === 'Esc';
+
 export {
   getRandomInteger,
-  createDatetime,
   getPrettyDate,
   getPrettyTime,
   getPrettyDatetime,
-  getDatetimeDuration
+  getDatetimeDuration,
+  isEscPressed
 };
