@@ -208,4 +208,4 @@ const offersList = [
 
 const getOffersList = () => offersList;
 
-export {getOffersList};
+export default getOffersList;

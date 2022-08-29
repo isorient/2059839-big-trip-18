@@ -1,7 +1,9 @@
 import {createDestination} from '../chmock/destinations.js';
 
 export default class DestinationsModel {
-  destinations = Array.from({length:7}, (v,i) => createDestination(i));
+  #destinations = Array.from({length:7}, (_,index) => createDestination(index));
 
-  getDestinations = () => this.destinations;
+  get destinations() {
+    return this.#destinations;
+  }
 }
