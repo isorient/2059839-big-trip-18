@@ -43,7 +43,6 @@ export default class TripPresenter {
     };
 
     const onPointRollUpButtonClick = () => {
-      //TODO добавить логику скрытия всех ранее открытых форм
       replacePointToEditForm();
       document.addEventListener('keydown', onEscKeydown);
     };
