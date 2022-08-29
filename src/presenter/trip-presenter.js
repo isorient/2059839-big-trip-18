@@ -27,39 +27,33 @@ export default class TripPresenter {
       if(isEscPressed(evt)) {
         evt.preventDefault();
         replaceEditFormToPoint();
-        removeEscKeydownListener();
+        document.removeEventListener('keydown', onEscKeydown);
       }
     };
 
-    function removeEscKeydownListener () {
-      document.removeEventListener('keydown', (evt) => onEscKeydown(evt));
-    }
+    const onFormSubmit = (evt) => {
+      evt.preventDefault();
+      replaceEditFormToPoint();
+      document.removeEventListener('keydown', onEscKeydown);
+    };
+
+    const onFormRollUpButtonClick = () => {
+      replaceEditFormToPoint();
+      document.removeEventListener('keydown', onEscKeydown);
+    };
 
     const onPointRollUpButtonClick = () => {
       //TODO добавить логику скрытия всех ранее открытых форм
       replacePointToEditForm();
-      document.addEventListener('keydown', (evt) => onEscKeydown(evt));
+      document.addEventListener('keydown', onEscKeydown);
     };
 
-    const onFormSubmit = () => {
-      replaceEditFormToPoint();
-      removeEscKeydownListener();
-    };
-    const onFormRollUpButtonClick = () => {
-      replaceEditFormToPoint();
-      removeEscKeydownListener();
-    };
-
-    pointComponent.element
-      .querySelector('.event__rollup-btn')
-      .addEventListener('click',onPointRollUpButtonClick);
+    pointComponent.element.querySelector('.event__rollup-btn')
+      .addEventListener('click', onPointRollUpButtonClick);
 
     pointEditComponent.element
       .querySelector('form')
-      .addEventListener('submit', (evt) => {
-        evt.preventDefault();
-        onFormSubmit();
-      });
+      .addEventListener('submit', onFormSubmit);
 
     pointEditComponent.element
       .querySelector('form')
