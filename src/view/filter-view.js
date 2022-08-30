@@ -22,7 +22,7 @@ const createFilterTemplate = () => (
 );
 
 class FilterView {
-  #element;
+  #element = null;
   get template() {
     return createFilterTemplate();
   }

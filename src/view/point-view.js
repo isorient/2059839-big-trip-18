@@ -102,10 +102,10 @@ const createPointTemplate = (point, offersData, destinationData) => {
 };
 
 class PointView {
-  #element;
-  #point;
-  #offersData;
-  #destinationData;
+  #element = null;
+  #point = null;
+  #offersData = null;
+  #destinationData = null;
 
   constructor(point, offersData, destinationData) {
     this.#point = point;
