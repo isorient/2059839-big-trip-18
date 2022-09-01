@@ -30,7 +30,7 @@ const createSortTemplate = () => (
 );
 
 class SortView {
-  #element;
+  #element = null;
 
   get template() {
     return createSortTemplate();

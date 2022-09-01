@@ -8,11 +8,12 @@ import DestinationsModel from './model/destinations-model.js';
 const tripInfoContainerElement = document.querySelector('.trip-main');
 const filterContainerElement = tripInfoContainerElement.querySelector('.trip-controls__filters');
 const tripContainerElement = document.querySelector('.trip-events');
-const tripPresenter = new TripPresenter();
+
 const pointsModel = new PointsModel();
 const offersModel = new OffersModel();
 const destinationsModel = new DestinationsModel();
+const tripPresenter = new TripPresenter(tripContainerElement, pointsModel, offersModel, destinationsModel);
 
 render(new FilterView(), filterContainerElement);
 
-tripPresenter.init(tripContainerElement, pointsModel, offersModel, destinationsModel);
+tripPresenter.init();
