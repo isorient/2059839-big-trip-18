@@ -1,4 +1,4 @@
-import {render} from '../render.js';
+import {render} from '../framework/render.js';
 import {isEscPressed} from '../utils.js';
 
 import PointListView from '../view/point-list-view.js';
@@ -25,7 +25,6 @@ export default class TripPresenter {
     this.#destinationsModel = destinationsModel;
   }
 
-  //в демке объявление renderPoint через стрелку - объявила через FD для единообразия, контекст проверяла - из зе сейм. Оставляем или нужна стрелка?
   #renderPoint (point, offers, destinations) {
     const pointComponent = new PointView(point, offers, destinations);
     const pointEditComponent = new PointEditView(point, offers, destinations);
@@ -42,32 +41,20 @@ export default class TripPresenter {
       }
     };
 
-    const onFormSubmit = (evt) => {
-      evt.preventDefault();
-      replaceEditFormToPoint();
-      document.removeEventListener('keydown', onEscKeydown);
-    };
-
-    const onFormRollUpButtonClick = () => {
-      replaceEditFormToPoint();
-      document.removeEventListener('keydown', onEscKeydown);
-    };
-
-    const onPointRollUpButtonClick = () => {
+    pointComponent.setEditClickHandler(() => {
       replacePointToEditForm();
       document.addEventListener('keydown', onEscKeydown);
-    };
+    });
 
-    pointComponent.element.querySelector('.event__rollup-btn')
-      .addEventListener('click', onPointRollUpButtonClick);
+    pointEditComponent.setFormSubmitHandler(() => {
+      replaceEditFormToPoint();
+      document.removeEventListener('keydown', onEscKeydown);
+    });
 
-    pointEditComponent.element
-      .querySelector('form')
-      .addEventListener('submit', onFormSubmit);
-
-    pointEditComponent.element
-      .querySelector('.event__rollup-btn')
-      .addEventListener('click', onFormRollUpButtonClick);
+    pointEditComponent.setFormClickHandler(() => {
+      replaceEditFormToPoint();
+      document.removeEventListener('keydown', onEscKeydown);
+    });
 
     render(pointComponent, this.#pointListComponent.element);
   }

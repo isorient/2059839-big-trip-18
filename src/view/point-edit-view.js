@@ -1,6 +1,10 @@
-import {createElement} from '../render.js';
 import {POINT_TYPES} from '../constants.js';
 import {getPrettyDatetime} from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
+
+const BLANK_POINT = {
+
+};
 
 const prepareWrapperTypesList = (selectedType) => {
   const typeElement = POINT_TYPES.map(
@@ -129,7 +133,7 @@ const prepareDestinationDetails = (selectedDestination) => (
   </section>`
 );
 
-const createPointEditTemplate = (point = {}, offersData, destinationData) => {
+const createPointEditTemplate = (point, offersData, destinationData) => {
   const { type: selectedType } = point;
   const selectedDestination = destinationData.find((el) => el.id === point.destination);
   const { offers: offersBySelectedType } = offersData.find((el) => el.type === point.type);
@@ -162,13 +166,13 @@ const createPointEditTemplate = (point = {}, offersData, destinationData) => {
   );
 };
 
-class PointEditView {
-  #element = null;
+export default class PointEditView extends AbstractView {
   #point = null;
   #offersData = null;
   #destinationData = null;
 
-  constructor(point, offersData, destinationData) {
+  constructor(point = BLANK_POINT, offersData, destinationData) {
+    super();
     this.#point = point;
     this.#offersData = offersData;
     this.#destinationData = destinationData;
@@ -178,17 +182,18 @@ class PointEditView {
     return createPointEditTemplate(this.#point, this.#offersData, this.#destinationData);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setFormSubmitHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
+  };
 
-    return this.#element;
-  }
+  setFormClickHandler = (callback) => {
+    this._callback.formSubmit = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formSubmitHandler);
+  };
 
-  removeElement() {
-    this.#element = null;
-  }
+  #formSubmitHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formSubmit();
+  };
 }
-
-export default PointEditView;
