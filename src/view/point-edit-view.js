@@ -2,10 +2,6 @@ import {POINT_TYPES} from '../constants.js';
 import {getPrettyDatetime} from '../utils.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
-const BLANK_POINT = {
-
-};
-
 const prepareWrapperTypesList = (selectedType) => {
   const typeElement = POINT_TYPES.map(
     (eventType) => {
@@ -133,7 +129,7 @@ const prepareDestinationDetails = (selectedDestination) => (
   </section>`
 );
 
-const createPointEditTemplate = (point, offersData, destinationData) => {
+const createPointEditTemplate = (point = {}, offersData, destinationData) => {
   const { type: selectedType } = point;
   const selectedDestination = destinationData.find((el) => el.id === point.destination);
   const { offers: offersBySelectedType } = offersData.find((el) => el.type === point.type);
@@ -171,7 +167,7 @@ export default class PointEditView extends AbstractView {
   #offersData = null;
   #destinationData = null;
 
-  constructor(point = BLANK_POINT, offersData, destinationData) {
+  constructor(point, offersData, destinationData) {
     super();
     this.#point = point;
     this.#offersData = offersData;
