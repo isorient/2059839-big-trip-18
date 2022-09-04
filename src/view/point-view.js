@@ -2,7 +2,7 @@ import {
   getPrettyDate,
   getPrettyTime,
   getDatetimeDuration
-} from '../utils.js';
+} from '../utils/points.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
 const getEventSchedule = (startDate, endDate) => (

@@ -1,5 +1,8 @@
-import {render} from '../framework/render.js';
-import {isEscPressed} from '../utils.js';
+import {
+  render,
+  replace
+} from '../framework/render.js';
+import {isEscPressed} from '../utils/common.js';
 
 import PointListView from '../view/point-list-view.js';
 import SortView from '../view/sort-view.js';
@@ -29,9 +32,9 @@ export default class TripPresenter {
     const pointComponent = new PointView(point, offers, destinations);
     const pointEditComponent = new PointEditView(point, offers, destinations);
 
-    const replacePointToEditForm = () => this.#pointListComponent.element.replaceChild(pointEditComponent.element, pointComponent.element);
+    const replacePointToEditForm = () => replace(pointEditComponent, pointComponent);
 
-    const replaceEditFormToPoint = () => this.#pointListComponent.element.replaceChild(pointComponent.element, pointEditComponent.element);
+    const replaceEditFormToPoint = () => replace(pointComponent, pointEditComponent);
 
     const onEscKeydown = (evt) => {
       if(isEscPressed(evt)) {

@@ -1,6 +1,6 @@
 import {
   getRandomInteger
-} from '../utils.js';
+} from '../utils/common.js';
 
 import {
   POINT_TYPES
