@@ -1,9 +1,9 @@
-import {createElement} from '../render.js';
 import {
   getPrettyDate,
   getPrettyTime,
   getDatetimeDuration
 } from '../utils.js';
+import AbstractView from '../framework/view/abstract-view.js';
 
 const getEventSchedule = (startDate, endDate) => (
   `<div class="event__schedule">
@@ -97,17 +97,18 @@ const createPointTemplate = (point, offersData, destinationData) => {
       ${getSelectedOffers(point, offersData)}
       ${getFavoriteButton(point.isFavorite)}
       ${getRollupButton()}
+    </div>
   </li>`
   );
 };
 
-class PointView {
-  #element = null;
+export default class PointView extends AbstractView {
   #point = null;
   #offersData = null;
   #destinationData = null;
 
   constructor(point, offersData, destinationData) {
+    super();
     this.#point = point;
     this.#offersData = offersData;
     this.#destinationData = destinationData;
@@ -117,17 +118,13 @@ class PointView {
     return createPointTemplate(this.#point, this.#offersData, this.#destinationData);
   }
 
-  get element() {
-    if (!this.#element) {
-      this.#element = createElement(this.template);
-    }
+  setEditClickHandler = (callback) => {
+    this._callback.click = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#clickHandler);
+  };
 
-    return this.#element;
-  }
-
-  removeElement() {
-    this.#element = null;
-  }
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.click();
+  };
 }
-
-export default PointView;
