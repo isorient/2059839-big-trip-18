@@ -32,30 +32,30 @@ export default class TripPresenter {
     const pointComponent = new PointView(point, offers, destinations);
     const pointEditComponent = new PointEditView(point, offers, destinations);
 
-    const replacePointToEditForm = () => replace(pointEditComponent, pointComponent);
+    const replaceFromPointToEditForm = () => replace(pointEditComponent, pointComponent);
 
-    const replaceEditFormToPoint = () => replace(pointComponent, pointEditComponent);
+    const replaceFromEditFormToPoint = () => replace(pointComponent, pointEditComponent);
 
     const onEscKeydown = (evt) => {
       if(isEscPressed(evt)) {
         evt.preventDefault();
-        replaceEditFormToPoint();
+        replaceFromEditFormToPoint();
         document.removeEventListener('keydown', onEscKeydown);
       }
     };
 
     pointComponent.setEditClickHandler(() => {
-      replacePointToEditForm();
+      replaceFromPointToEditForm();
       document.addEventListener('keydown', onEscKeydown);
     });
 
     pointEditComponent.setFormSubmitHandler(() => {
-      replaceEditFormToPoint();
+      replaceFromEditFormToPoint();
       document.removeEventListener('keydown', onEscKeydown);
     });
 
     pointEditComponent.setFormClickHandler(() => {
-      replaceEditFormToPoint();
+      replaceFromEditFormToPoint();
       document.removeEventListener('keydown', onEscKeydown);
     });
 

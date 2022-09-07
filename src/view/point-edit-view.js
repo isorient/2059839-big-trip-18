@@ -1,5 +1,5 @@
 import {POINT_TYPES} from '../constants.js';
-import {getPrettyDatetime} from '../utils/points.js';
+import {getPrettyDatetime} from '../utils/dates.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
 const prepareWrapperTypesList = (selectedType) => {
