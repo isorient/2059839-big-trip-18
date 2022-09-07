@@ -11,7 +11,7 @@ const createFilterItemTemplate = (filter, isChecked) => (
       ${isChecked ? 'checked' : ''} 
       ${!filter.name === 'everything' && filter.count === 0 ? 'disabled' : ''}
     > 
-    <label class="trip-filters__filter-label" for="filter-past">${filter.name}</label>
+    <label class="trip-filters__filter-label" for="filter-${filter.name}">${filter.name}</label>
   </div>`
 );
 
