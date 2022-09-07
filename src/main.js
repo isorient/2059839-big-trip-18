@@ -16,6 +16,6 @@ const destinationsModel = new DestinationsModel();
 
 const tripPresenter = new TripPresenter(tripContainerElement, pointsModel, offersModel, destinationsModel);
 
-render(new FilterView(pointsModel.filteredPoints), filterContainerElement);
+render(new FilterView(pointsModel.filterLabels), filterContainerElement);
 
 tripPresenter.init();

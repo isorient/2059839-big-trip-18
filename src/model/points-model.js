@@ -22,7 +22,7 @@ export default class PointsModel {
     return this.#points;
   }
 
-  get filteredPoints() {
+  get filterLabels() {
     return filterPoints(this.#points);
   }
 }
