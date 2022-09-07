@@ -1,7 +1,10 @@
 import dayjs from 'dayjs';
 import duration from 'dayjs/plugin/duration';
+import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 
 dayjs.extend(duration);
+dayjs.extend(isSameOrAfter);
+
 
 const getPrettyDate = (eventPeriod) => dayjs(eventPeriod).format('MMM D');
 const getPrettyTime = (eventPeriod) => dayjs(eventPeriod).format('HH:mm');
@@ -20,9 +23,14 @@ const getDatetimeDuration = (startPeriod, endPeriod) => {
   return datetimeDuration.format(outputFormat);
 };
 
+const isPointInThePast = (dateTo) => dateTo && dayjs(dateTo).isBefore(dayjs(), 'D');
+const isPointInTheFuture = (dateFrom) => dateFrom && dayjs(dateFrom).isSameOrAfter(dayjs(), 'D');
+
 export {
   getPrettyDate,
   getPrettyTime,
   getPrettyDatetime,
-  getDatetimeDuration
+  getDatetimeDuration,
+  isPointInThePast,
+  isPointInTheFuture
 };
