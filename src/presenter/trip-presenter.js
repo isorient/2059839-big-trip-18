@@ -1,5 +1,8 @@
-import {render} from '../framework/render.js';
-import {isEscPressed} from '../utils.js';
+import {
+  render,
+  replace
+} from '../framework/render.js';
+import {isEscPressed} from '../utils/common.js';
 
 import PointListView from '../view/point-list-view.js';
 import SortView from '../view/sort-view.js';
@@ -29,30 +32,30 @@ export default class TripPresenter {
     const pointComponent = new PointView(point, offers, destinations);
     const pointEditComponent = new PointEditView(point, offers, destinations);
 
-    const replacePointToEditForm = () => this.#pointListComponent.element.replaceChild(pointEditComponent.element, pointComponent.element);
+    const replaceFromPointToEditForm = () => replace(pointEditComponent, pointComponent);
 
-    const replaceEditFormToPoint = () => this.#pointListComponent.element.replaceChild(pointComponent.element, pointEditComponent.element);
+    const replaceFromEditFormToPoint = () => replace(pointComponent, pointEditComponent);
 
     const onEscKeydown = (evt) => {
       if(isEscPressed(evt)) {
         evt.preventDefault();
-        replaceEditFormToPoint();
+        replaceFromEditFormToPoint();
         document.removeEventListener('keydown', onEscKeydown);
       }
     };
 
     pointComponent.setEditClickHandler(() => {
-      replacePointToEditForm();
+      replaceFromPointToEditForm();
       document.addEventListener('keydown', onEscKeydown);
     });
 
     pointEditComponent.setFormSubmitHandler(() => {
-      replaceEditFormToPoint();
+      replaceFromEditFormToPoint();
       document.removeEventListener('keydown', onEscKeydown);
     });
 
     pointEditComponent.setFormClickHandler(() => {
-      replaceEditFormToPoint();
+      replaceFromEditFormToPoint();
       document.removeEventListener('keydown', onEscKeydown);
     });
 

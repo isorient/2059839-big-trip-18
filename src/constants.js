@@ -10,6 +10,18 @@ const POINT_TYPES = [
   'restaurant'
 ];
 
+const DESTINATIONS_LIST = [
+  'Loloburg'
+];
+
+const FilterType = {
+  EVERYTHING:'everything',
+  PAST:'past',
+  FUTURE:'future'
+};
+
 export {
-  POINT_TYPES
+  POINT_TYPES,
+  DESTINATIONS_LIST,
+  FilterType
 };
