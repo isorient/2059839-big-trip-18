@@ -16,7 +16,7 @@ const filterPoints = (points) => Object.entries(filter).map(
 );
 
 export default class PointsModel {
-  #points = Array.from({length:33}, (_,index) => createPoint(index));
+  #points = Array.from({length:48}, (_,index) => createPoint(index));
 
   get points() {
     return this.#points;

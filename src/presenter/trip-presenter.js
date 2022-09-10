@@ -1,6 +1,7 @@
 import {
   render,
-  replace
+  replace,
+  RenderPosition
 } from '../framework/render.js';
 import {isEscPressed} from '../utils/common.js';
 
@@ -12,20 +13,41 @@ import PointEmptyListView from '../view/point-list-empty-view.js';
 
 
 export default class TripPresenter {
-  #pointListComponent = new PointListView();
   #pointsModel = null;
   #offersModel = null;
   #destinationsModel = null;
-  #pointsList = null;
-  #offersList = null;
-  #destinationsList = null;
+
   #tripContainer = null;
+
+  #pointListComponent = new PointListView();
+  #pointEmptyListComponent = new PointEmptyListView();
+  #sortComponent = new SortView();
+
+  #points = [];
+  #offers = [];
+  #destinations = [];
 
   constructor (tripContainer, pointsModel, offersModel, destinationsModel) {
     this.#tripContainer = tripContainer;
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
+  }
+
+  init () {
+    this.#points = [...this.#pointsModel.points];
+    this.#offers = [...this.#offersModel.offers];
+    this.#destinations = [...this.#destinationsModel.destinations];
+
+    this.#renderTripBoard();
+  }
+
+  #renderSort () {
+    render(this.#sortComponent, this.#tripContainer, RenderPosition.AFTERBEGIN);
+  }
+
+  #renderPointEmptyList () {
+    render(this.#pointEmptyListComponent, this.#tripContainer);
   }
 
   #renderPoint (point, offers, destinations) {
@@ -62,28 +84,21 @@ export default class TripPresenter {
     render(pointComponent, this.#pointListComponent.element);
   }
 
-  #renderPointsList () {
-    if (this.#pointsList.length === 0) {
-      return render(new PointEmptyListView(), this.#tripContainer);
-    }
-
-    render(new SortView(), this.#tripContainer);
-    render(this.#pointListComponent, this.#tripContainer);
-
-    for (let i = 0; i < this.#pointsList.length; i++) {
-      this.#renderPoint(
-        this.#pointsList[i],
-        this.#offersList,
-        this.#destinationsList
-      );
-    }
+  #renderPoints () {
+    this.#points.forEach((point) => this.#renderPoint(point, this.#offers, this.#destinations));
   }
 
-  init () {
-    this.#pointsList = [...this.#pointsModel.points];
-    this.#offersList = [...this.#offersModel.offers];
-    this.#destinationsList = [...this.#destinationsModel.destinations];
+  #renderPointList () {
+    render(this.#pointListComponent, this.#tripContainer);
+    this.#renderPoints();
+  }
 
-    this.#renderPointsList();
+  #renderTripBoard () {
+    if (this.#points.length === 0) {
+      return this.#renderPointEmptyList();
+    }
+
+    this.#renderSort();
+    this.#renderPointList();
   }
 }
