@@ -30,7 +30,7 @@ const createSortTemplate = () => (
 );
 
 export default class SortView extends AbstractView {
-  get template() {
+  get template () {
     return createSortTemplate();
   }
 }
