@@ -10,13 +10,15 @@ import PointView from '../view/point-view.js';
 
 export default class PointPresenter {
   #pointListContainer = null;
+  #changeData = null;
 
   #point = null;
   #pointComponent = null;
   #pointEditComponent = null;
 
-  constructor (pointListContainer) {
+  constructor (pointListContainer, changeData) {
     this.#pointListContainer = pointListContainer;
+    this.#changeData = changeData;
   }
 
   init = (point, offers, destinations) => {
@@ -29,11 +31,14 @@ export default class PointPresenter {
 
     this.#pointComponent.setEditClickHandler(this.#handleEditClick);
 
+    this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
+
     this.#pointEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
     this.#pointEditComponent.setFormClickHandler(this.#handleFormClick);
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
-      return render(this.#pointComponent, this.#pointListContainer);
+      render(this.#pointComponent, this.#pointListContainer);
+      return;
     }
 
     if (this.#pointListContainer.contains(prevPointComponent.element)) {
@@ -80,5 +85,9 @@ export default class PointPresenter {
 
   #handleFormClick = () => {
     this.#replaceFromEditFormToPoint();
+  };
+
+  #handleFavoriteClick = () => {
+    this.#changeData({...this.#point, isFavorite:!this.#point.isFavorite});
   };
 }
