@@ -24,6 +24,8 @@ export default class TripPresenter {
   #offers = [];
   #destinations = [];
 
+  #pointPresenter = new Map();
+
   constructor (tripContainer, pointsModel, offersModel, destinationsModel) {
     this.#tripContainer = tripContainer;
     this.#pointsModel = pointsModel;
@@ -50,6 +52,7 @@ export default class TripPresenter {
   #renderPoint = (point, offers, destinations) => {
     const pointPresenter = new PointPresenter(this.#pointListComponent.element);
     pointPresenter.init(point, offers, destinations);
+    this.#pointPresenter.set(point.id, pointPresenter);
   };
 
   #renderPoints = () => {
@@ -59,6 +62,11 @@ export default class TripPresenter {
   #renderPointList = () => {
     render(this.#pointListComponent, this.#tripContainer);
     this.#renderPoints();
+  };
+
+  #clearPointList = () => {
+    this.#pointPresenter.forEach((presenter) => presenter.destroy());
+    this.#pointPresenter.clear();
   };
 
   #renderTripBoard = () => {
