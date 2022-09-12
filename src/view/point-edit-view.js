@@ -184,12 +184,17 @@ export default class PointEditView extends AbstractView {
   };
 
   setFormClickHandler = (callback) => {
-    this._callback.formSubmit = callback;
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formSubmitHandler);
+    this._callback.formClick = callback;
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formClickHandler);
   };
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this._callback.formSubmit();
+    this._callback.formSubmit(this.#point);
+  };
+
+  #formClickHandler = (evt) => {
+    evt.preventDefault();
+    this._callback.formClick(this.#point);
   };
 }

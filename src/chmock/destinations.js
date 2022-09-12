@@ -33,7 +33,7 @@ const createDestination = (index) => (
     'name': destinationNameList[ getRandomInteger(0, destinationNameList.length - 1) ],
     'pictures': [
       {
-        'src': `http://picsum.photos/300/200?r=${getRandomInteger(0,10)}`,
+        'src': `http://picsum.photos/300/200?r=${getRandomInteger(1000,10000)}`,
         'description': photosDescriptionList[getRandomInteger(0, photosDescriptionList.length - 1)]
       }
     ]
