@@ -23,12 +23,32 @@ const filterPoints = (points) => Object.entries(filter).map(
   }),
 );
 
+const updatePoint = (items, update) => {
+  const index = items.findIndex((item) => item.id === update.id);
+
+  if (index === -1) {
+    return items;
+  }
+
+  return [
+    ...items.slice(0, index),
+    update,
+    ...items.slice(index + 1)
+  ];
+};
+
 const sortPointsByDateAsc = (targetPoint, pointToCompare) => compareDates(targetPoint.dateFrom, pointToCompare.dateFrom);
-const sortPointsByTimeDesc = (targetPoint, pointToCompare) => getDatetimeDuration(pointToCompare) - getDatetimeDuration(targetPoint) ;
+
+const sortPointsByTimeDesc = (targetPoint, pointToCompare) => {
+  const pointToCompareDuration = getDatetimeDuration(pointToCompare.dateFrom, pointToCompare.dateTo);
+  const targetPointDuration = getDatetimeDuration(targetPoint.dateFrom, targetPoint.dateTo);
+  return pointToCompareDuration.$ms - targetPointDuration.$ms;
+};
+
 const sortPointsByPriceDesc = (targetPoint, pointToCompare) => pointToCompare.basePrice - targetPoint.basePrice;
 
 export default class PointsModel {
-  #rawPoints = Array.from({length:48}, (_,index) => createPoint(index));
+  #rawPoints = Array.from({length:3}, (_,index) => createPoint(index));
   #pointsDefaultSortOrder = this.#rawPoints.slice().sort(sortPointsByDateAsc);
 
 
@@ -49,5 +69,10 @@ export default class PointsModel {
       case SortType.PRICE:
         return this.#rawPoints.sort(sortPointsByPriceDesc);
     }
+  };
+
+  updatePoint = (updatedPoint) => {
+    updatePoint(this.#pointsDefaultSortOrder, updatedPoint);
+    return updatePoint(this.#rawPoints, updatedPoint);
   };
 }

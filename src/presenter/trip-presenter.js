@@ -2,7 +2,6 @@ import {
   render,
   RenderPosition
 } from '../framework/render.js';
-import {updateItem} from '../utils/common.js';
 
 import PointListView from '../view/point-list-view.js';
 import SortView from '../view/sort-view.js';
@@ -89,7 +88,7 @@ export default class TripPresenter {
   };
 
   #handlePointChange = (updatedPoint) => {
-    this.#points = updateItem(this.#points, updatedPoint);
+    this.#points = [...this.#pointsModel.updatePoint(updatedPoint)];
     this.#pointPresenter.get(updatedPoint.id).init(updatedPoint, this.#offers, this.#destinations);
   };
 
