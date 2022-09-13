@@ -23,9 +23,6 @@ const getFormattedDatetimeDuration = (startPeriod, endPeriod) => {
   const minuteDifference = compareDates(endPeriod, startPeriod, 'minute');
   const datetimeDuration = dayjs.duration(minuteDifference, 'minute');
 
-  console.log('minuteDifference', minuteDifference);
-  console.log('datetimeDuration',datetimeDuration);
-
   let outputFormat = 'mm[M]';
   //смотрим есть ли сутки в минутах
   outputFormat = (minuteDifference >= MinuteConverter.DAY) ? 'DD[D] HH[H] mm[M]' : outputFormat ;

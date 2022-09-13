@@ -83,7 +83,7 @@ export default class TripPresenter {
     this.#renderPointList();
   };
 
-  #sortpoints = (sortType) => {
+  #sortPoints = (sortType) => {
     this.#points = [...this.#pointsModel.sortPoints(sortType)];
     this.#currentSortType = sortType;
   };
@@ -98,8 +98,12 @@ export default class TripPresenter {
   };
 
   #handleSortTypeChange = (sortType) => {
-    // - Сортируем задачи
-    // - Очищаем список
-    // - Рендерим список заново
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortPoints(sortType);
+    this.#clearPointList();
+    this.#renderPointList();
   };
 }

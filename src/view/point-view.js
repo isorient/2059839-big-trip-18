@@ -84,7 +84,6 @@ const getRollupButton = () => (
 
 const createPointTemplate = (point, offersData, destinationData) => {
   const destination = destinationData.find( (el) => el.id === point.destination);
-  console.log(point);
 
   return (
     `<li class="trip-events__item">
