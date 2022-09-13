@@ -20,8 +20,15 @@ const FilterType = {
   FUTURE:'future'
 };
 
+const SortType = {
+  DAY: 'day',
+  TIME: 'time',
+  PRICE: 'price',
+};
+
 export {
   POINT_TYPES,
   DESTINATIONS_LIST,
-  FilterType
+  FilterType,
+  SortType
 };

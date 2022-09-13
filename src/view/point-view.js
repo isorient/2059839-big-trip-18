@@ -1,7 +1,7 @@
 import {
   getPrettyDate,
   getPrettyTime,
-  getDatetimeDuration
+  getFormattedDatetimeDuration
 } from '../utils/dates.js';
 import AbstractView from '../framework/view/abstract-view.js';
 
@@ -12,7 +12,7 @@ const getEventSchedule = (startDate, endDate) => (
       &mdash;
       <time class="event__end-time" datetime="${endDate}">${getPrettyTime(endDate)}</time>
     </p>
-    <p class="event__duration">${getDatetimeDuration(startDate, endDate)}</p>
+    <p class="event__duration">${getFormattedDatetimeDuration(startDate, endDate)}</p>
   </div>`
 );
 

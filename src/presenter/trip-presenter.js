@@ -2,13 +2,13 @@ import {
   render,
   RenderPosition
 } from '../framework/render.js';
-import {updateItem} from '../utils/common.js';
 
 import PointListView from '../view/point-list-view.js';
 import SortView from '../view/sort-view.js';
 import PointEmptyListView from '../view/point-list-empty-view.js';
 
 import PointPresenter from './point-presenter.js';
+import { SortType } from '../constants.js';
 
 export default class TripPresenter {
   #pointsModel = null;
@@ -24,6 +24,7 @@ export default class TripPresenter {
   #points = [];
   #offers = [];
   #destinations = [];
+  #currentSortType = SortType.DAY;
 
   #pointPresenter = new Map();
 
@@ -44,6 +45,8 @@ export default class TripPresenter {
 
   #renderSort = () => {
     render(this.#sortComponent, this.#tripContainer, RenderPosition.AFTERBEGIN);
+
+    this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
   };
 
   #renderPointEmptyList () {
@@ -79,12 +82,27 @@ export default class TripPresenter {
     this.#renderPointList();
   };
 
+  #sortPoints = (sortType) => {
+    this.#points = [...this.#pointsModel.sortPoints(sortType)];
+    this.#currentSortType = sortType;
+  };
+
   #handlePointChange = (updatedPoint) => {
-    this.#points = updateItem(this.#points, updatedPoint);
+    this.#points = [...this.#pointsModel.updatePoint(updatedPoint)];
     this.#pointPresenter.get(updatedPoint.id).init(updatedPoint, this.#offers, this.#destinations);
   };
 
   #handleModeChange = () => {
     this.#pointPresenter.forEach((presenter) => presenter.resetView());
+  };
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#sortPoints(sortType);
+    this.#clearPointList();
+    this.#renderPointList();
   };
 }
