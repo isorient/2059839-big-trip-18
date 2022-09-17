@@ -11,7 +11,12 @@ const POINT_TYPES = [
 ];
 
 const DESTINATIONS_LIST = [
-  'Loloburg'
+  'Chamonix',
+  'Amsterdam',
+  'Geneva',
+  'Loloburg',
+  'Kekland',
+  'Zorroville'
 ];
 
 const FilterType = {
