@@ -48,7 +48,7 @@ const sortPointsByTimeDesc = (targetPoint, pointToCompare) => {
 const sortPointsByPriceDesc = (targetPoint, pointToCompare) => pointToCompare.basePrice - targetPoint.basePrice;
 
 export default class PointsModel {
-  #rawPoints = Array.from({length:3}, (_,index) => createPoint(index));
+  #rawPoints = Array.from({length:33}, (_,index) => createPoint(index));
   #pointsDefaultSortOrder = this.#rawPoints.slice().sort(sortPointsByDateAsc);
 
 

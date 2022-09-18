@@ -1,6 +1,20 @@
-import {POINT_TYPES} from '../constants.js';
+import {
+  POINT_TYPES,
+  DESTINATIONS_LIST
+} from '../constants.js';
 import {getPrettyDatetime} from '../utils/dates.js';
-import AbstractView from '../framework/view/abstract-view.js';
+import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+
+const BLANK_POINT = {
+  'id': null,
+  'type': null,
+  'dateFrom': null,
+  'dateTo': null,
+  'destination': null,
+  'basePrice': null,
+  'isFavorite': false,
+  'offers': []
+};
 
 const prepareWrapperTypesList = (selectedType) => {
   const typeElement = POINT_TYPES.map(
@@ -35,14 +49,13 @@ const prepareWrapperTypesList = (selectedType) => {
   );
 };
 
-const prepareDestinationList = () => (
-  //TODO добавить список направлений не хардкодом
-  `<datalist id="destination-list-1">
-    <option value="Amsterdam"></option>
-    <option value="Geneva"></option>
-    <option value="Chamonix"></option>
-  </datalist>`
-);
+const prepareDestinationList = () => {
+  const destinationElement = DESTINATIONS_LIST.map((item) => `<option value="${item}"></option>`).join('');
+  return (
+    `<datalist id="destination-list-1">
+      ${destinationElement}
+    </datalist>`);
+};
 const prepareDestinationField = (eventType, selectedDestination) => (
   `<div class="event__field-group  event__field-group--destination">
     <label class="event__label  event__type-output" for="event-destination-1">
@@ -82,7 +95,7 @@ const prepareOffers = (selectedOffers, offersBySelectedType) => {
 
       return (
         `<div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer-o${offer.id}" ${isChecked}>
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${isChecked}>
           <label class="event__offer-label" for="event-offer-${offer.id}">
             <span class="event__offer-title">${offer.title}</span>
             &plus;&euro;&nbsp;
@@ -129,11 +142,10 @@ const prepareDestinationDetails = (selectedDestination) => (
   </section>`
 );
 
-const createPointEditTemplate = (point = {}, offersData, destinationData) => {
-  const { type: selectedType } = point;
+const createPointEditTemplate = (point, offersData, destinationData) => {
+  const { type: selectedType, offers: selectedOffers } = point;
   const selectedDestination = destinationData.find((el) => el.id === point.destination);
   const { offers: offersBySelectedType } = offersData.find((el) => el.type === point.type);
-  const { offers: selectedOffers } = point;
 
   return (
     `<li class="trip-events__item">
@@ -162,20 +174,21 @@ const createPointEditTemplate = (point = {}, offersData, destinationData) => {
   );
 };
 
-export default class PointEditView extends AbstractView {
-  #point = null;
+export default class PointEditView extends AbstractStatefulView {
+  _state = null;
   #offersData = null;
   #destinationData = null;
 
-  constructor(point, offersData, destinationData) {
+  constructor(point = BLANK_POINT, offersData, destinationData) {
     super();
-    this.#point = point;
+    this._state = PointEditView.parsePointToState(point);
     this.#offersData = offersData;
     this.#destinationData = destinationData;
+    this.#setInnerHandlers();
   }
 
   get template() {
-    return createPointEditTemplate(this.#point, this.#offersData, this.#destinationData);
+    return createPointEditTemplate(this._state, this.#offersData, this.#destinationData);
   }
 
   setFormSubmitHandler = (callback) => {
@@ -188,13 +201,80 @@ export default class PointEditView extends AbstractView {
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formClickHandler);
   };
 
+  reset = (point) => {
+    this.updateElement(PointEditView.parsePointToState(point));
+  };
+
+  _restoreHandlers = () => {
+    this.#setInnerHandlers();
+    this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setFormClickHandler(this._callback.formClick);
+  };
+
+  #setInnerHandlers = () => {
+    this.element.querySelector('.event__type-list').addEventListener('click', this.#typeListClickHandler);
+    this.element.querySelector('.event__input--destination').addEventListener('input', this.#destinationInputHandler);
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChangeHandler);
+    this.element.querySelector('.event__available-offers').addEventListener('click', this.#offersClickHandler);
+  };
+
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
-    this._callback.formSubmit(this.#point);
+    this._callback.formSubmit(PointEditView.parseStateToPoint(this._state));
   };
 
   #formClickHandler = (evt) => {
     evt.preventDefault();
-    this._callback.formClick(this.#point);
+    this._callback.formClick(PointEditView.parseStateToPoint(this._state));
   };
+
+  #typeListClickHandler = (evt) => {
+    if (evt.target.tagName !== 'INPUT') {
+      return;
+    }
+    this.updateElement({
+      type: evt.target.value,
+      offers:[],
+    });
+  };
+
+  #destinationInputHandler = (evt) => {
+    const newDestination = this.#destinationData.find((el) => el.name === evt.target.value);
+    if (newDestination !== undefined) {
+      this.updateElement({
+        destination: newDestination.id,
+      });
+    }
+  };
+
+  #priceChangeHandler = (evt) => {
+    this._setState({
+      basePrice: Number(evt.target.value),
+    });
+  };
+
+  #offersClickHandler = (evt) => {
+    if (evt.target.tagName !== 'INPUT'){
+      return;
+    }
+    const currentOffers = this._state.offers.slice();
+    const editedOfferId = Number(evt.target.id.replace('event-offer-',''));
+
+    if (evt.target.checked) {
+      currentOffers.push(editedOfferId);
+    }
+
+    if (!evt.target.checked) {
+      currentOffers.splice(currentOffers.indexOf(editedOfferId), 1);
+    }
+
+    this.updateElement({
+      offers: currentOffers
+    });
+
+  };
+
+  static parsePointToState = (point) => ({...point});
+
+  static parseStateToPoint = (state) => ({...state});
 }
