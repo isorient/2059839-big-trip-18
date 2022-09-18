@@ -33,6 +33,5 @@ const createDestination = (index) => (
 );
 
 export {
-  destinationNameList,
   createDestination
 };
