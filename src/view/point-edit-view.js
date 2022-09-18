@@ -4,6 +4,9 @@ import {
 } from '../constants.js';
 import {getPrettyDatetime} from '../utils/dates.js';
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
+import flatpickr from 'flatpickr';
+
+import 'flatpickr/dist/flatpickr.min.css';
 
 const BLANK_POINT = {
   'id': null,
@@ -178,6 +181,8 @@ export default class PointEditView extends AbstractStatefulView {
   _state = null;
   #offersData = null;
   #destinationData = null;
+  #startDatePicker = null;
+  #endDatePicker = null;
 
   constructor(point = BLANK_POINT, offersData, destinationData) {
     super();
@@ -185,6 +190,7 @@ export default class PointEditView extends AbstractStatefulView {
     this.#offersData = offersData;
     this.#destinationData = destinationData;
     this.#setInnerHandlers();
+    this.#setDatepicker();
   }
 
   get template() {
@@ -205,8 +211,23 @@ export default class PointEditView extends AbstractStatefulView {
     this.updateElement(PointEditView.parsePointToState(point));
   };
 
+  removeElement = () => {
+    super.removeElement();
+
+    if (this.#startDatePicker) {
+      this.#startDatePicker.destroy();
+      this.#startDatePicker = null;
+    }
+
+    if (this.#endDatePicker) {
+      this.#endDatePicker.destroy();
+      this.#endDatePicker = null;
+    }
+  };
+
   _restoreHandlers = () => {
     this.#setInnerHandlers();
+    this.#setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
     this.setFormClickHandler(this._callback.formClick);
   };
@@ -216,6 +237,42 @@ export default class PointEditView extends AbstractStatefulView {
     this.element.querySelector('.event__input--destination').addEventListener('input', this.#destinationInputHandler);
     this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChangeHandler);
     this.element.querySelector('.event__available-offers').addEventListener('click', this.#offersClickHandler);
+  };
+
+  #setDatepicker = () => {
+    this.#startDatePicker = flatpickr(
+      this.element.querySelector('#event-start-time-1'),
+      {
+        enableTime: true,
+        'time_24hr': true,
+        dateFormat: 'd/m/y H:i',
+        defaultDate: this._state.dateFrom,
+        onChange: this.#startDateChangeHandler,
+      },
+    );
+
+    this.#endDatePicker = flatpickr(
+      this.element.querySelector('#event-end-time-1'),
+      {
+        enableTime: true,
+        'time_24hr': true,
+        dateFormat: 'd/m/y H:i',
+        defaultDate: this._state.dateTo,
+        onChange: this.#endDateChangeHandler,
+      },
+    );
+  };
+
+  #startDateChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateFrom: userDate,
+    });
+  };
+
+  #endDateChangeHandler = ([userDate]) => {
+    this.updateElement({
+      dateTo: userDate,
+    });
   };
 
   #formSubmitHandler = (evt) => {

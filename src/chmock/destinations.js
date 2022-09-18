@@ -1,13 +1,5 @@
 import {getRandomInteger} from '../utils/common.js';
-
-const destinationNameList = [
-  'Chamonix',
-  'Amsterdam',
-  'Geneva',
-  'Loloburg',
-  'Kekland',
-  'Zorroville'
-];
+import {DESTINATIONS_LIST} from '../constants.js';
 
 const destinationsDescriptionList = [
   'It is a beautiful city, a true asian pearl, with crowded streets.',
@@ -30,7 +22,7 @@ const createDestination = (index) => (
   {
     'id': index,
     'description': destinationsDescriptionList[getRandomInteger(0, destinationsDescriptionList.length - 1)],
-    'name': destinationNameList[index],
+    'name': DESTINATIONS_LIST[index],
     'pictures': [
       {
         'src': `http://picsum.photos/300/200?r=${getRandomInteger(1000,10000)}`,
