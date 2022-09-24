@@ -43,11 +43,11 @@ export default class TripPresenter {
   }
 
   get points () {
-    // return this.#pointsModel.points;
     return this.#pointsModel.sortPoints(this.#currentSortType);
   }
 
   init = () => {
+    this.points;
     this.#offers = [...this.#offersModel.offers];
     this.#destinations = [...this.#destinationsModel.destinations];
 
@@ -68,7 +68,6 @@ export default class TripPresenter {
   #renderPoint = (point, offers, destinations) => {
     const pointPresenter = new PointPresenter(
       this.#pointListComponent.element,
-      // this.#handlePointChange,
       this.#handleViewAction,
       this.#handleModeChange
     );
@@ -84,12 +83,6 @@ export default class TripPresenter {
     render(this.#pointListComponent, this.#tripContainer);
     this.#renderPoints(this.points);
   };
-
-  // TODO delete
-  // #clearPointList = () => {
-  //   this.#pointPresenter.forEach((presenter) => presenter.destroy());
-  //   this.#pointPresenter.clear();
-  // };
 
   #renderTripBoard = () => {
     if (this.points.length === 0) {
@@ -118,12 +111,6 @@ export default class TripPresenter {
     this.#currentSortType = sortType;
   };
 
-  //на смену этому колбеку пришел handleViewAction
-  #handlePointChange = (updatedPoint) => {
-    this.#points = [...this.#pointsModel.updatePoint(updatedPoint)];
-    this.#pointPresenter.get(updatedPoint.id).init(updatedPoint, this.#offers, this.#destinations);
-  };
-
   #handleModeChange = () => {
     this.#pointPresenter.forEach((presenter) => presenter.resetView());
   };
@@ -133,9 +120,8 @@ export default class TripPresenter {
       return;
     }
 
-    this.#sortPoints(sortType);
-    // this.#clearPointList();
-    // this.#renderPointList();
+    // this.#sortPoints(sortType);
+    this.#currentSortType = sortType;
     this.#clearTripBoard({resetRenderedTaskCount: true});
     this.#renderTripBoard();
   };

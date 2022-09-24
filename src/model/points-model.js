@@ -71,10 +71,14 @@ export default class PointsModel extends Observable {
   sortPoints = (sortType) => {
     switch (sortType) {
       case SortType.DAY:
-        return this.#pointsDefaultSortOrder;
+        // return this.#pointsDefaultSortOrder;
+        console.log('sortType day',sortType);
+        return this.#rawPoints.sort(sortPointsByDateAsc);
       case SortType.TIME:
+        console.log('sortType time',sortType);
         return this.#rawPoints.sort(sortPointsByTimeDesc);
       case SortType.PRICE:
+        console.log('sortType price',sortType);
         return this.#rawPoints.sort(sortPointsByPriceDesc);
     }
   };
