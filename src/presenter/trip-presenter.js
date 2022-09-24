@@ -1,5 +1,12 @@
 import {
+  SortType,
+  UserAction,
+  UpdateType
+} from '../constants.js';
+
+import {
   render,
+  remove,
   RenderPosition
 } from '../framework/render.js';
 
@@ -8,7 +15,6 @@ import SortView from '../view/sort-view.js';
 import PointEmptyListView from '../view/point-list-empty-view.js';
 
 import PointPresenter from './point-presenter.js';
-import { SortType } from '../constants.js';
 
 export default class TripPresenter {
   #pointsModel = null;
@@ -19,7 +25,7 @@ export default class TripPresenter {
 
   #pointListComponent = new PointListView();
   #pointEmptyListComponent = new PointEmptyListView();
-  #sortComponent = new SortView();
+  #sortComponent = null;
 
   #points = [];
   #offers = [];
@@ -33,10 +39,15 @@ export default class TripPresenter {
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
+    this.#pointsModel.addObserver(this.#handleModelEvent);
+  }
+
+  get points () {
+    // return this.#pointsModel.points;
+    return this.#pointsModel.sortPoints(this.#currentSortType);
   }
 
   init = () => {
-    this.#points = [...this.#pointsModel.points];
     this.#offers = [...this.#offersModel.offers];
     this.#destinations = [...this.#destinationsModel.destinations];
 
@@ -44,9 +55,10 @@ export default class TripPresenter {
   };
 
   #renderSort = () => {
-    render(this.#sortComponent, this.#tripContainer, RenderPosition.AFTERBEGIN);
+    this.#sortComponent = new SortView(this.#currentSortType);
 
     this.#sortComponent.setSortTypeChangeHandler(this.#handleSortTypeChange);
+    render(this.#sortComponent, this.#tripContainer, RenderPosition.AFTERBEGIN);
   };
 
   #renderPointEmptyList () {
@@ -54,32 +66,51 @@ export default class TripPresenter {
   }
 
   #renderPoint = (point, offers, destinations) => {
-    const pointPresenter = new PointPresenter(this.#pointListComponent.element, this.#handlePointChange, this.#handleModeChange);
+    const pointPresenter = new PointPresenter(
+      this.#pointListComponent.element,
+      // this.#handlePointChange,
+      this.#handleViewAction,
+      this.#handleModeChange
+    );
     pointPresenter.init(point, offers, destinations);
     this.#pointPresenter.set(point.id, pointPresenter);
   };
 
-  #renderPoints = () => {
-    this.#points.forEach((point) => this.#renderPoint(point, this.#offers, this.#destinations));
+  #renderPoints = (points) => {
+    points.forEach((point) => this.#renderPoint(point, this.#offers, this.#destinations));
   };
 
   #renderPointList = () => {
     render(this.#pointListComponent, this.#tripContainer);
-    this.#renderPoints();
+    this.#renderPoints(this.points);
   };
 
-  #clearPointList = () => {
-    this.#pointPresenter.forEach((presenter) => presenter.destroy());
-    this.#pointPresenter.clear();
-  };
+  // TODO delete
+  // #clearPointList = () => {
+  //   this.#pointPresenter.forEach((presenter) => presenter.destroy());
+  //   this.#pointPresenter.clear();
+  // };
 
   #renderTripBoard = () => {
-    if (this.#points.length === 0) {
+    if (this.points.length === 0) {
       return this.#renderPointEmptyList();
     }
 
+    render(this.#pointListComponent, this.#tripContainer);
+    this.#renderPoints(this.points);
     this.#renderSort();
-    this.#renderPointList();
+  };
+
+  #clearTripBoard = ({resetSortType = false} = {}) => {
+    this.#pointPresenter.forEach((presenter) => presenter.destroy());
+    this.#pointPresenter.clear();
+
+    remove(this.#sortComponent);
+    remove(this.#pointEmptyListComponent);
+
+    if (resetSortType) {
+      this.#currentSortType = SortType.DAY;
+    }
   };
 
   #sortPoints = (sortType) => {
@@ -87,6 +118,7 @@ export default class TripPresenter {
     this.#currentSortType = sortType;
   };
 
+  //на смену этому колбеку пришел handleViewAction
   #handlePointChange = (updatedPoint) => {
     this.#points = [...this.#pointsModel.updatePoint(updatedPoint)];
     this.#pointPresenter.get(updatedPoint.id).init(updatedPoint, this.#offers, this.#destinations);
@@ -102,7 +134,54 @@ export default class TripPresenter {
     }
 
     this.#sortPoints(sortType);
-    this.#clearPointList();
-    this.#renderPointList();
+    // this.#clearPointList();
+    // this.#renderPointList();
+    this.#clearTripBoard({resetRenderedTaskCount: true});
+    this.#renderTripBoard();
+  };
+
+  #handleViewAction = (actionType, updateType, updatedPoint) => {
+    console.log(actionType, updateType, updatedPoint);
+    console.log('actionType',actionType);
+    console.log('updateType',updateType);
+    console.log('updatedPoint',updatedPoint);
+    // Здесь будем вызывать обновление модели.
+    // actionType - действие пользователя, нужно чтобы понять, какой метод модели вызвать
+    // updateType - тип изменений, нужно чтобы понять, что после нужно обновить
+    // update - обновленные данные
+    switch (actionType) {
+      case UserAction.UPDATE_POINT:
+        // return this.#pointsModel.updatePoint(updateType, updatedPoint);
+        this.#pointsModel.updatePoints(updateType, updatedPoint);
+        this.#pointPresenter.get(updatedPoint.id).init(updatedPoint, this.#offers, this.#destinations);
+        break;
+      case UserAction.ADD_POINT:
+        return this.#pointsModel.addPoint(updateType, updatedPoint);
+      case UserAction.DELETE_POINT:
+        return this.#pointsModel.deletePoint(updateType, updatedPoint);
+    }
+  };
+
+  #handleModelEvent = (updateType, updatedPoint) => {
+    console.log(updateType, updatedPoint);
+    // В зависимости от типа изменений решаем, что делать:
+    // - обновить часть списка (например, когда поменялось описание)
+    // - обновить список (например, когда задача ушла в архив)
+    // - обновить всю доску (например, при переключении фильтра)
+    switch (updateType) {
+      case UpdateType.PATCH:
+        // - обновить часть списка (например, когда поменялось описание)
+        return this.#pointPresenter.get(updatedPoint.id).init(updatedPoint, this.#offers, this.#destinations);
+      case UpdateType.MINOR:
+        // - обновить список (например, когда задача ушла в архив)
+        this.#clearTripBoard();
+        this.#renderTripBoard();
+        break;
+      case UpdateType.MAJOR:
+        // - обновить всю доску (например, при переключении фильтра)
+        this.#clearTripBoard({resetSortType: true});
+        this.#renderTripBoard();
+        break;
+    }
   };
 }

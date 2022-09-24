@@ -1,9 +1,17 @@
 import {
+  UserAction,
+  UpdateType
+} from '../constants.js';
+
+import {
   render,
   replace,
   remove
 } from '../framework/render.js';
 import {isEscPressed} from '../utils/common.js';
+import {
+  areDatesEqual
+} from '../utils/dates.js';
 
 import PointEditView from '../view/point-edit-view.js';
 import PointView from '../view/point-view.js';
@@ -103,8 +111,24 @@ export default class PointPresenter {
   };
 
   #handleFormSubmit = (point) => {
-    this.#changeData(point);
+    // Проверяем, поменялись ли в задаче данные, которые попадают под фильтрацию,
+    // а значит требуют перерисовки списка - если таких нет, это PATCH-обновление
+    const isMinorUpdate = !areDatesEqual(point.dateFrom, this.#point.dateFrom) || !areDatesEqual(point.dateTo, this.#point.dateTo) || point.basePrice !== this.#point.basePrice;
+
+    this.#changeData(
+      UserAction.UPDATE_POINT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      point
+    );
     this.#replaceEditFormByPoint();
+  };
+
+  #handleDeleteClick = (point) => {
+    this.#changeData(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point
+    );
   };
 
   #handleFormClick = (point) => {
@@ -113,6 +137,10 @@ export default class PointPresenter {
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData({...this.#point, isFavorite:!this.#point.isFavorite});
+    this.#changeData(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      {...this.#point, isFavorite:!this.#point.isFavorite}
+    );
   };
 }

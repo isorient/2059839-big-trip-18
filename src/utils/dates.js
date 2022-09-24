@@ -6,7 +6,7 @@ dayjs.extend(duration);
 dayjs.extend(isSameOrAfter);
 
 //словарь, показывающий кол-во минут в единице времени
-const MinuteConverter = {
+const minuteConverter = {
   DAY: 1440,
   HOUR: 60
 };
@@ -17,19 +17,23 @@ const getPrettyDatetime = (eventPeriod) => dayjs(eventPeriod).format('DD/MM/YY H
 
 const compareDates = (targetDate, dateToCompare, format = 'minute') => dayjs(targetDate).diff(dayjs(dateToCompare), format);
 
-const getDatetimeDuration = (startPeriod, endPeriod) => dayjs.duration( compareDates(endPeriod, startPeriod, 'minute'), 'minute');
+const areDatesEqual = (targetDate, dateToCompare) => dayjs(targetDate).isSame(dayjs(dateToCompare, 'day'));
+
+const getDatetimeDuration = (startPeriod, endPeriod) => dayjs.duration( compareDates(endPeriod, startPeriod, 'minute'), 'minutes');
 
 const getFormattedDatetimeDuration = (startPeriod, endPeriod) => {
   const minuteDifference = compareDates(endPeriod, startPeriod, 'minute');
-  const datetimeDuration = dayjs.duration(minuteDifference, 'minute');
+  const datetimeDuration = dayjs.duration(minuteDifference, 'minutes');
 
-  let outputFormat = 'mm[M]';
-  //смотрим есть ли сутки в минутах
-  outputFormat = (minuteDifference >= MinuteConverter.DAY) ? 'DD[D] HH[H] mm[M]' : outputFormat ;
-  //смотрим есть ли часы
-  outputFormat = (MinuteConverter.DAY > minuteDifference >= MinuteConverter.HOUR) ? 'HH[H] mm[M]' : outputFormat ;
+  if (minuteDifference >= minuteConverter.DAY) {
+    return datetimeDuration.format('DD[D] HH[H] mm[M]');
+  }
 
-  return datetimeDuration.format(outputFormat);
+  if (minuteDifference >= minuteConverter.HOUR && minuteDifference < minuteConverter.DAY) {
+    return datetimeDuration.format('HH[H] mm[M]');
+  }
+
+  return datetimeDuration.format('mm[M]');
 };
 
 const isPointInThePast = (dateTo) => dateTo && dayjs(dateTo).isBefore(dayjs(), 'D');
@@ -43,5 +47,6 @@ export {
   getFormattedDatetimeDuration,
   isPointInThePast,
   isPointInTheFuture,
-  compareDates
+  compareDates,
+  areDatesEqual
 };

@@ -1,4 +1,5 @@
 import createPoint from '../chmock/points.js';
+import Observable from '../framework/observable.js';
 import {
   FilterType,
   SortType
@@ -24,10 +25,17 @@ const filterPoints = (points) => Object.entries(filter).map(
 );
 
 const updatePoint = (items, update) => {
-  const index = items.findIndex((item) => item.id === update.id);
+  console.log('items', items);
+  console.log('update', update);
+  const index = items.findIndex((item) => {
+    console.log('item', item);
+    return item.id === update.id;
+  }
+  );
 
   if (index === -1) {
     return items;
+    // throw new Error('Can\'t update unexisting point');
   }
 
   return [
@@ -47,8 +55,8 @@ const sortPointsByTimeDesc = (targetPoint, pointToCompare) => {
 
 const sortPointsByPriceDesc = (targetPoint, pointToCompare) => pointToCompare.basePrice - targetPoint.basePrice;
 
-export default class PointsModel {
-  #rawPoints = Array.from({length:33}, (_,index) => createPoint(index));
+export default class PointsModel extends Observable {
+  #rawPoints = Array.from({length:5}, (_,index) => createPoint(index));
   #pointsDefaultSortOrder = this.#rawPoints.slice().sort(sortPointsByDateAsc);
 
 
@@ -71,8 +79,49 @@ export default class PointsModel {
     }
   };
 
-  updatePoint = (updatedPoint) => {
+  updatePoint = (updateType, updatedPoint) => {
     updatePoint(this.#pointsDefaultSortOrder, updatedPoint);
+    this._notify(updateType, updatedPoint);
     return updatePoint(this.#rawPoints, updatedPoint);
+  };
+
+  updatePoints = (updateType, updatedPoint) => {
+    const index = this.#rawPoints.findIndex((task) => task.id === updatedPoint.id);
+
+    if (index === -1) {
+      throw new Error('Can\'t update unexisting task');
+    }
+
+    this.#rawPoints = [
+      ...this.#rawPoints.slice(0, index),
+      updatedPoint,
+      ...this.#rawPoints.slice(index + 1),
+    ];
+
+    this._notify(updateType, updatedPoint);
+  };
+
+  addPoint = (updateType, updatedPoint) => {
+    this.#rawPoints = [
+      updatedPoint,
+      ...this.#rawPoints,
+    ];
+
+    this._notify(updateType, updatedPoint);
+  };
+
+  deletePoint = (updateType, updatedPoint) => {
+    const index = this.#rawPoints.findIndex((task) => task.id === updatedPoint.id);
+
+    if (index === -1) {
+      throw new Error('Can\'t delete unexisting task');
+    }
+
+    this.#rawPoints = [
+      ...this.#rawPoints.slice(0, index),
+      ...this.#rawPoints.slice(index + 1),
+    ];
+
+    this._notify(updateType);
   };
 }

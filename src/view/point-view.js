@@ -43,6 +43,7 @@ const getSelectedOffers = (point, offersData) => {
       </ul>`
     );
   }
+  return '';
 };
 
 const getEventDate = (startDate) => (`<time class="event__date" datetime="${startDate}">${getPrettyDate(startDate)}</time>`);
