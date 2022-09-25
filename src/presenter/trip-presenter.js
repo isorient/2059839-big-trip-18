@@ -1,7 +1,8 @@
 import {
   SortType,
   UserAction,
-  UpdateType
+  UpdateType,
+  FilterType
 } from '../constants.js';
 
 import {
@@ -12,7 +13,7 @@ import {
 
 import PointListView from '../view/point-list-view.js';
 import SortView from '../view/sort-view.js';
-import PointEmptyListView from '../view/point-list-empty-view.js';
+import PointEmptyListView from '../view/point-empty-list-view.js';
 
 import PointPresenter from './point-presenter.js';
 
@@ -20,34 +21,43 @@ export default class TripPresenter {
   #pointsModel = null;
   #offersModel = null;
   #destinationsModel = null;
+  #filterModel = null;
 
   #tripContainer = null;
 
   #pointListComponent = new PointListView();
-  #pointEmptyListComponent = new PointEmptyListView();
+  #pointEmptyListComponent = null;
   #sortComponent = null;
 
   #points = [];
   #offers = [];
   #destinations = [];
   #currentSortType = SortType.DAY;
+  #filterType = FilterType.EVERYTHING;
 
   #pointPresenter = new Map();
 
-  constructor (tripContainer, pointsModel, offersModel, destinationsModel) {
+  constructor (tripContainer, pointsModel, offersModel, destinationsModel, filterModel) {
     this.#tripContainer = tripContainer;
+
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
     this.#destinationsModel = destinationsModel;
+    this.#filterModel = filterModel;
+
     this.#pointsModel.addObserver(this.#handleModelEvent);
+    this.#filterModel.addObserver(this.#handleModelEvent);
   }
 
   get points () {
+    this.#filterType = this.#filterModel.filter;
+    this.#pointsModel.filterPoints(this.#filterType);
     return this.#pointsModel.sortPoints(this.#currentSortType);
   }
 
+
   init = () => {
-    this.points;
+    this.#points = this.points;
     this.#offers = [...this.#offersModel.offers];
     this.#destinations = [...this.#destinationsModel.destinations];
 
@@ -62,6 +72,7 @@ export default class TripPresenter {
   };
 
   #renderPointEmptyList () {
+    this.#pointEmptyListComponent = new PointEmptyListView(this.#filterType);
     render(this.#pointEmptyListComponent, this.#tripContainer);
   }
 
@@ -77,11 +88,6 @@ export default class TripPresenter {
 
   #renderPoints = (points) => {
     points.forEach((point) => this.#renderPoint(point, this.#offers, this.#destinations));
-  };
-
-  #renderPointList = () => {
-    render(this.#pointListComponent, this.#tripContainer);
-    this.#renderPoints(this.points);
   };
 
   #renderTripBoard = () => {
@@ -100,6 +106,10 @@ export default class TripPresenter {
 
     remove(this.#sortComponent);
     remove(this.#pointEmptyListComponent);
+
+    if (this.#pointEmptyListComponent) {
+      remove(this.#pointEmptyListComponent);
+    }
 
     if (resetSortType) {
       this.#currentSortType = SortType.DAY;

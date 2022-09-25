@@ -19,10 +19,12 @@ const filter = {
 
 const filterPoints = (points) => Object.entries(filter).map(
   ([filterName, filterPointsList]) => ({
+    type: filterName,
     name: filterName,
     count: filterPointsList(points).length,
   }),
 );
+
 
 const updatePoint = (items, update) => {
   console.log('items', items);
@@ -57,7 +59,8 @@ const sortPointsByPriceDesc = (targetPoint, pointToCompare) => pointToCompare.ba
 
 export default class PointsModel extends Observable {
   #rawPoints = Array.from({length:5}, (_,index) => createPoint(index));
-  #pointsDefaultSortOrder = this.#rawPoints.slice().sort(sortPointsByDateAsc);
+  #filteredPoints = filter[FilterType.EVERYTHING](this.#rawPoints);
+  #pointsDefaultSortOrder = this.#filteredPoints.sort(sortPointsByDateAsc);
 
 
   get points() {
@@ -65,22 +68,26 @@ export default class PointsModel extends Observable {
   }
 
   get filterLabels() {
-    return filterPoints(this.#pointsDefaultSortOrder);
+    return filterPoints(this.#rawPoints);
   }
 
-  sortPoints = (sortType) => {
+  sortPoints = (sortType = sortPointsByDateAsc) => {
     switch (sortType) {
       case SortType.DAY:
-        // return this.#pointsDefaultSortOrder;
-        console.log('sortType day',sortType);
-        return this.#rawPoints.sort(sortPointsByDateAsc);
+        return this.#filteredPoints.sort(sortPointsByDateAsc);
       case SortType.TIME:
-        console.log('sortType time',sortType);
-        return this.#rawPoints.sort(sortPointsByTimeDesc);
+        return this.#filteredPoints.sort(sortPointsByTimeDesc);
       case SortType.PRICE:
-        console.log('sortType price',sortType);
-        return this.#rawPoints.sort(sortPointsByPriceDesc);
+        return this.#filteredPoints.sort(sortPointsByPriceDesc);
     }
+  };
+
+  filterPoints = (filterType) => {
+    console.log(filter);
+    console.log(filter[filterType]);
+    console.log(filterType);
+    this.#filteredPoints = filter[filterType](this.#rawPoints);
+    return this.#filteredPoints;
   };
 
   updatePoint = (updateType, updatedPoint) => {
