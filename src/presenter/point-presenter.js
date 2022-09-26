@@ -1,9 +1,17 @@
 import {
+  UserAction,
+  UpdateType
+} from '../constants.js';
+
+import {
   render,
   replace,
   remove
 } from '../framework/render.js';
 import {isEscPressed} from '../utils/common.js';
+import {
+  areDatesEqual
+} from '../utils/dates.js';
 
 import PointEditView from '../view/point-edit-view.js';
 import PointView from '../view/point-view.js';
@@ -15,7 +23,7 @@ const Mode = {
 
 export default class PointPresenter {
   #pointListContainer = null;
-  #changeData = null;
+  #changeDataHandler = null;
   #changeMode = null;
 
   #point = null;
@@ -26,9 +34,9 @@ export default class PointPresenter {
   #pointComponent = null;
   #pointEditComponent = null;
 
-  constructor (pointListContainer, changeData, changeMode) {
+  constructor (pointListContainer, changeDataHandler, changeMode) {
     this.#pointListContainer = pointListContainer;
-    this.#changeData = changeData;
+    this.#changeDataHandler = changeDataHandler;
     this.#changeMode = changeMode;
   }
 
@@ -46,6 +54,7 @@ export default class PointPresenter {
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
 
     this.#pointEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
+    this.#pointEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
     this.#pointEditComponent.setFormClickHandler(this.#handleFormClick);
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
@@ -103,16 +112,36 @@ export default class PointPresenter {
   };
 
   #handleFormSubmit = (point) => {
-    this.#changeData(point);
+    // Проверяем, поменялись ли в задаче данные, которые попадают под фильтрацию,
+    // а значит требуют перерисовки списка - если таких нет, это PATCH-обновление
+    const isMinorUpdate = !areDatesEqual(point.dateFrom, this.#point.dateFrom) || !areDatesEqual(point.dateTo, this.#point.dateTo) || point.basePrice !== this.#point.basePrice;
+
+    this.#changeDataHandler(
+      UserAction.UPDATE_POINT,
+      isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
+      point
+    );
     this.#replaceEditFormByPoint();
   };
 
+  #handleDeleteClick = (point) => {
+    this.#changeDataHandler(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point
+    );
+  };
+
   #handleFormClick = (point) => {
-    this.#changeData(point);
+    this.#changeDataHandler(point);
     this.#replaceEditFormByPoint();
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData({...this.#point, isFavorite:!this.#point.isFavorite});
+    this.#changeDataHandler(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      {...this.#point, isFavorite:!this.#point.isFavorite}
+    );
   };
 }

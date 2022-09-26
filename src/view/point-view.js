@@ -43,6 +43,7 @@ const getSelectedOffers = (point, offersData) => {
       </ul>`
     );
   }
+  return '';
 };
 
 const getEventDate = (startDate) => (`<time class="event__date" datetime="${startDate}">${getPrettyDate(startDate)}</time>`);
@@ -83,7 +84,7 @@ const getRollupButton = () => (
 );
 
 const createPointTemplate = (point, offersData, destinationData) => {
-  const destination = destinationData.find( (el) => el.id === point.destination);
+  const destination = destinationData.find( (item) => item.id === point.destination);
 
   return (
     `<li class="trip-events__item">
