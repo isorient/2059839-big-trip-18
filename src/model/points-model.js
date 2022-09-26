@@ -1,5 +1,3 @@
-import createPoint from '../chmock/points.js';
-import Observable from '../framework/observable.js';
 import {
   FilterType,
   SortType
@@ -10,6 +8,10 @@ import {
   getDatetimeDuration,
   compareDates
 } from '../utils/dates.js';
+
+import createPoint from '../chmock/points.js';
+
+import Observable from '../framework/observable.js';
 
 const filter = {
   [FilterType.EVERYTHING]: (points) => points,
@@ -25,28 +27,6 @@ const filterPoints = (points) => Object.entries(filter).map(
   }),
 );
 
-
-const updatePoint = (items, update) => {
-  console.log('items', items);
-  console.log('update', update);
-  const index = items.findIndex((item) => {
-    console.log('item', item);
-    return item.id === update.id;
-  }
-  );
-
-  if (index === -1) {
-    return items;
-    // throw new Error('Can\'t update unexisting point');
-  }
-
-  return [
-    ...items.slice(0, index),
-    update,
-    ...items.slice(index + 1)
-  ];
-};
-
 const sortPointsByDateAsc = (targetPoint, pointToCompare) => compareDates(targetPoint.dateFrom, pointToCompare.dateFrom);
 
 const sortPointsByTimeDesc = (targetPoint, pointToCompare) => {
@@ -61,7 +41,6 @@ export default class PointsModel extends Observable {
   #rawPoints = Array.from({length:5}, (_,index) => createPoint(index));
   #filteredPoints = filter[FilterType.EVERYTHING](this.#rawPoints);
   #pointsDefaultSortOrder = this.#filteredPoints.sort(sortPointsByDateAsc);
-
 
   get points() {
     return this.#pointsDefaultSortOrder;
@@ -83,17 +62,8 @@ export default class PointsModel extends Observable {
   };
 
   filterPoints = (filterType) => {
-    console.log(filter);
-    console.log(filter[filterType]);
-    console.log(filterType);
     this.#filteredPoints = filter[filterType](this.#rawPoints);
     return this.#filteredPoints;
-  };
-
-  updatePoint = (updateType, updatedPoint) => {
-    updatePoint(this.#pointsDefaultSortOrder, updatedPoint);
-    this._notify(updateType, updatedPoint);
-    return updatePoint(this.#rawPoints, updatedPoint);
   };
 
   updatePoints = (updateType, updatedPoint) => {

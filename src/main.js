@@ -9,6 +9,7 @@ import FilterPresenter from './presenter/filter-presenter.js';
 const tripInfoContainerElement = document.querySelector('.trip-main');
 const filterContainerElement = tripInfoContainerElement.querySelector('.trip-controls__filters');
 const tripContainerElement = document.querySelector('.trip-events');
+const addPointButtonElement = tripInfoContainerElement.querySelector('.trip-main__event-add-btn');
 
 const pointsModel = new PointsModel();
 const offersModel = new OffersModel();
@@ -18,7 +19,16 @@ const filterModel = new FilterModel();
 const filterPresenter = new FilterPresenter(filterContainerElement, filterModel, pointsModel);
 const tripPresenter = new TripPresenter(tripContainerElement, pointsModel, offersModel, destinationsModel, filterModel);
 
-console.log('pointsModel.filterLabels',pointsModel.filterLabels);
+const onNewPointFormClose = () => {
+  addPointButtonElement.disabled = false;
+};
+
+const onNewPointFormClick = () => {
+  tripPresenter.createPoint(onNewPointFormClose);
+  addPointButtonElement.disabled = true;
+};
+
+addPointButtonElement.addEventListener('click', onNewPointFormClick);
 
 filterPresenter.init();
 tripPresenter.init();

@@ -2,7 +2,12 @@ import {
   POINT_TYPES,
   DESTINATIONS_LIST
 } from '../constants.js';
-import {getPrettyDatetime} from '../utils/dates.js';
+
+import {
+  getPrettyDatetime,
+  getCurrentDatetime
+} from '../utils/dates.js';
+
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import flatpickr from 'flatpickr';
 
@@ -10,11 +15,11 @@ import 'flatpickr/dist/flatpickr.min.css';
 
 const BLANK_POINT = {
   'id': null,
-  'type': null,
-  'dateFrom': null,
-  'dateTo': null,
-  'destination': null,
-  'basePrice': null,
+  'type': POINT_TYPES[0],
+  'dateFrom': getCurrentDatetime(),
+  'dateTo': getCurrentDatetime(),
+  'destination': 0,
+  'basePrice': '',
   'isFavorite': false,
   'offers': []
 };
@@ -52,20 +57,16 @@ const prepareWrapperTypesList = (selectedType) => {
   );
 };
 
-const prepareDestinationList = () => {
-  const destinationElement = DESTINATIONS_LIST.map((item) => `<option value="${item}"></option>`).join('');
-  return (
-    `<datalist id="destination-list-1">
-      ${destinationElement}
-    </datalist>`);
-};
+const prepareDestinationList = (selectedDestinationName) => DESTINATIONS_LIST.map((item) => `<option value="${item}" ${item === selectedDestinationName ? 'selected' : ''}>${item}</option>`).join('');
+
 const prepareDestinationField = (eventType, selectedDestination) => (
   `<div class="event__field-group  event__field-group--destination">
     <label class="event__label  event__type-output" for="event-destination-1">
       ${eventType}
     </label>
-    <input class="event__input  event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${selectedDestination.name}" list="destination-list-1">
-    ${prepareDestinationList()}
+    <select class="event__input  event__input--destination" id="event-destination-1" name="event-destination" value="${selectedDestination.name}">
+    ${prepareDestinationList(selectedDestination.name)}
+    </select>
   </div>`
 );
 
@@ -85,7 +86,7 @@ const preparePrice = (price) => (
     <span class="visually-hidden">Price</span>
     &euro;
   </label>
-  <input class="event__input  event__input--price" id="event-price-1" type="text" name="event-price" value="${price}">
+  <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}">
   </div>`
 );
 
@@ -124,7 +125,7 @@ const prepareOffers = (selectedOffers, offersBySelectedType) => {
 
 const prepareDestinationPhoto = (destinationPhoto) => {
   if (destinationPhoto.length > 0) {
-    const photoElement = destinationPhoto.map( (el) => (`<img class="event__photo" src="${el.src}" alt="${el.description}"></img>`)
+    const photoElement = destinationPhoto.map( (item) => (`<img class="event__photo" src="${item.src}" alt="${item.description}"></img>`)
     )
       .join('');
     return (
@@ -145,10 +146,18 @@ const prepareDestinationDetails = (selectedDestination) => (
   </section>`
 );
 
+const prepareRollUpButton = (pointId) => {
+  if (pointId === null) {
+    return '';
+  }
+
+  return '<button class="event__rollup-btn" type="button">';
+};
+
 const createPointEditTemplate = (point, offersData, destinationData) => {
   const { type: selectedType, offers: selectedOffers } = point;
-  const selectedDestination = destinationData.find((el) => el.id === point.destination);
-  const { offers: offersBySelectedType } = offersData.find((el) => el.type === point.type);
+  const selectedDestination = destinationData.find((item) => item.id === point.destination);
+  const { offers: offersBySelectedType } = offersData.find((item) => item.type === point.type);
 
   return (
     `<li class="trip-events__item">
@@ -164,7 +173,7 @@ const createPointEditTemplate = (point, offersData, destinationData) => {
   
           <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
           <button class="event__reset-btn" type="reset">Delete</button>
-          <button class="event__rollup-btn" type="button">
+          ${prepareRollUpButton(point.id)}
             <span class="visually-hidden">Open event</span>
           </button>
         </header>
@@ -306,7 +315,7 @@ export default class PointEditView extends AbstractStatefulView {
   };
 
   #destinationInputHandler = (evt) => {
-    const newDestination = this.#destinationData.find((el) => el.name === evt.target.value);
+    const newDestination = this.#destinationData.find((item) => item.name === evt.target.value);
     if (newDestination !== undefined) {
       this.updateElement({
         destination: newDestination.id,

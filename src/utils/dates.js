@@ -5,7 +5,6 @@ import isSameOrAfter from 'dayjs/plugin/isSameOrAfter';
 dayjs.extend(duration);
 dayjs.extend(isSameOrAfter);
 
-//словарь, показывающий кол-во минут в единице времени
 const minuteConverter = {
   DAY: 1440,
   HOUR: 60
@@ -14,6 +13,8 @@ const minuteConverter = {
 const getPrettyDate = (eventPeriod) => dayjs(eventPeriod).format('MMM D');
 const getPrettyTime = (eventPeriod) => dayjs(eventPeriod).format('HH:mm');
 const getPrettyDatetime = (eventPeriod) => dayjs(eventPeriod).format('DD/MM/YY HH:mm');
+
+const getCurrentDatetime = () => dayjs().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 
 const compareDates = (targetDate, dateToCompare, format = 'minute') => dayjs(targetDate).diff(dayjs(dateToCompare), format);
 
@@ -43,6 +44,7 @@ export {
   getPrettyDate,
   getPrettyTime,
   getPrettyDatetime,
+  getCurrentDatetime,
   getDatetimeDuration,
   getFormattedDatetimeDuration,
   isPointInThePast,

@@ -23,7 +23,7 @@ const Mode = {
 
 export default class PointPresenter {
   #pointListContainer = null;
-  #changeData = null;
+  #changeDataHandler = null;
   #changeMode = null;
 
   #point = null;
@@ -34,9 +34,9 @@ export default class PointPresenter {
   #pointComponent = null;
   #pointEditComponent = null;
 
-  constructor (pointListContainer, changeData, changeMode) {
+  constructor (pointListContainer, changeDataHandler, changeMode) {
     this.#pointListContainer = pointListContainer;
-    this.#changeData = changeData;
+    this.#changeDataHandler = changeDataHandler;
     this.#changeMode = changeMode;
   }
 
@@ -116,7 +116,7 @@ export default class PointPresenter {
     // а значит требуют перерисовки списка - если таких нет, это PATCH-обновление
     const isMinorUpdate = !areDatesEqual(point.dateFrom, this.#point.dateFrom) || !areDatesEqual(point.dateTo, this.#point.dateTo) || point.basePrice !== this.#point.basePrice;
 
-    this.#changeData(
+    this.#changeDataHandler(
       UserAction.UPDATE_POINT,
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       point
@@ -125,7 +125,7 @@ export default class PointPresenter {
   };
 
   #handleDeleteClick = (point) => {
-    this.#changeData(
+    this.#changeDataHandler(
       UserAction.DELETE_POINT,
       UpdateType.MINOR,
       point
@@ -133,12 +133,12 @@ export default class PointPresenter {
   };
 
   #handleFormClick = (point) => {
-    this.#changeData(point);
+    this.#changeDataHandler(point);
     this.#replaceEditFormByPoint();
   };
 
   #handleFavoriteClick = () => {
-    this.#changeData(
+    this.#changeDataHandler(
       UserAction.UPDATE_POINT,
       UpdateType.MINOR,
       {...this.#point, isFavorite:!this.#point.isFavorite}
