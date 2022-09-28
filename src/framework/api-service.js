@@ -8,6 +8,8 @@ export default class ApiService {
   #method = {
     GET: 'GET',
     PUT: 'PUT',
+    POST: 'POST',
+    DELETE: 'DELETE',
   };
 
   /**
