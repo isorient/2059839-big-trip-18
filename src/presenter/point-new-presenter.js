@@ -58,6 +58,25 @@ export default class PointNewPresenter {
     document.removeEventListener('keydown', this.#escKeyDownHandler);
   };
 
+  setAborting = () => {
+    const resetFormState = () => {
+      this.#pointEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#pointEditComponent.shake(resetFormState);
+  };
+
+  setSaving = () => {
+    this.#pointEditComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  };
+
   #escKeyDownHandler = (evt) => {
     if(isEscPressed(evt)) {
       evt.preventDefault();
@@ -69,7 +88,7 @@ export default class PointNewPresenter {
     this.#changeDataHandler(
       UserAction.ADD_POINT,
       UpdateType.MINOR,
-      {id: 100, ...point}
+      point
     );
     this.destroy();
   };

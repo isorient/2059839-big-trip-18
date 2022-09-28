@@ -19,85 +19,103 @@ const BLANK_POINT = {
   'offers': []
 };
 
-const prepareWrapperTypesList = (selectedType, offers) => {
-  const typeElement = offers.map(
-    (offerItem) => {
-      const isChecked = offerItem.type === selectedType
+const formFieldSetting = {
+  price:{
+    isRequired:true,
+    minValue:0
+  },
+  dateTo:{
+    minValue: getCurrentDatetime(),
+  }
+
+};
+
+const prepareWrapperTypesList = (selectedType, offers, isDisabled) => {
+  const typeElement = offers.map((offerItem) => offerItem.type)
+    .sort()
+    .map((offer) => {
+      const isChecked = offer === selectedType
         ? 'checked'
         : '';
 
       return (
         `<div class="event__type-item">
-          <input id="event-type-${offerItem.type}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${offerItem.type}" ${isChecked}>
-          <label class="event__type-label  event__type-label--${offerItem.type}" for="event-type-${offerItem.type}">${offerItem.type}</label>
+          <input id="event-type-${offer}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${offer}" ${isChecked}>
+          <label class="event__type-label  event__type-label--${offer}" for="event-type-${offer}">${offer}</label>
         </div>`
       );
-    }
-  )
+    })
     .join('');
 
   return (
-    `<label class="event__type  event__type-btn" for="event-type-toggle">
-      <span class="visually-hidden">Choose event type</span>
-      <img class="event__type-icon" width="17" height="17" src="img/icons/${selectedType}.png" alt="Event type icon">
-    </label>
-    <input class="event__type-toggle  visually-hidden" id="event-type-toggle" type="checkbox">
+    `<div class="event__type-wrapper">
+      <label class="event__type  event__type-btn" for="event-type-toggle">
+        <span class="visually-hidden">Choose event type</span>
+        <img class="event__type-icon" width="17" height="17" src="img/icons/${selectedType}.png" alt="Event type icon">
+      </label>
+      <input class="event__type-toggle  visually-hidden" id="event-type-toggle" type="checkbox" ${isDisabled ? 'disabled' : ''}>
 
-    <div class="event__type-list">
-      <fieldset class="event__type-group">
-        <legend class="visually-hidden">Event type</legend>
-        ${typeElement}
-      </fieldset>
+      <div class="event__type-list">
+        <fieldset class="event__type-group">
+          <legend class="visually-hidden">Event type</legend>
+          ${typeElement}
+        </fieldset>
+      </div>
     </div>`
   );
 };
 
-const prepareDestinationList = (selectedDestinationName, destinations) => destinations.map((destinationItem) => `<option value="${destinationItem.name}" ${destinationItem.name === selectedDestinationName ? 'selected' : ''}>${destinationItem.name}</option>`).join('');
+const prepareDestinationList = (selectedDestinationName, destinations) => (destinations.map((destinationItem) => destinationItem.name)
+  .sort()
+  .map((destination) => `<option value="${destination}" ${destination === selectedDestinationName ? 'selected' : ''}>${destination}</option>`)
+  .join('')
+);
 
-const prepareDestinationField = (pointType, selectedDestination, destinations) => (
+
+const prepareDestinationField = (pointType, selectedDestination, destinations, isDisabled) => (
   `<div class="event__field-group  event__field-group--destination">
     <label class="event__label  event__type-output" for="event-destination-1">
       ${pointType}
     </label>
-    <select class="event__input  event__input--destination" id="event-destination-1" name="event-destination" value="${selectedDestination.name}">
+    <select class="event__input  event__input--destination" id="event-destination-1" name="event-destination" value="${selectedDestination.name}"  ${isDisabled ? 'disabled' : ''}>
     ${prepareDestinationList(selectedDestination.name, destinations)}
     </select>
   </div>`
 );
 
-const prepareTimeField = (dateFrom, dateTo) => (
+const prepareTimeField = (dateFrom, dateTo, isDisabled) => (
   `<div class="event__field-group  event__field-group--time">
     <label class="visually-hidden" for="event-start-time-1">From</label>
-    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getPrettyDatetime(dateFrom)}">
+    <input class="event__input  event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${getPrettyDatetime(dateFrom)}" ${isDisabled ? 'disabled' : ''}>
     &mdash;
     <label class="visually-hidden" for="event-end-time-1">To</label>
-    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getPrettyDatetime(dateTo)}">
+    <input class="event__input  event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${getPrettyDatetime(dateTo)}" ${isDisabled ? 'disabled' : ''}>
   </div>`
 );
 
-const preparePrice = (price) => (
+const preparePrice = (price, isDisabled) => (
   `<div class="event__field-group  event__field-group--price">
   <label class="event__label" for="event-price-1">
     <span class="visually-hidden">Price</span>
     &euro;
   </label>
-  <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}" min="0">
+  <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}" min="${formFieldSetting.price.minValue}" ${formFieldSetting.price.isRequired ? 'required' : ''} ${isDisabled ? 'disabled' : ''}>
   </div>`
 );
 
-const prepareOffers = (selectedOffers, offersBySelectedType) => {
-  if (offersBySelectedType.length === 0 || offersBySelectedType === null || offersBySelectedType === undefined) {
+const prepareOffers = (selectedOffers, availableOffers, isDisabled) => {
+  if (availableOffers.length === 0 || availableOffers === null || availableOffers === undefined) {
     return '';
   }
 
-  const offerElement = offersBySelectedType.map((offer) => {
+  const offerElement = availableOffers.map((offer) => {
     const isChecked = selectedOffers.includes(offer.id)
       ? 'checked'
       : '';
 
     return (
       `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${isChecked}>
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${isChecked} ${isDisabled ? 'disabled' : ''}>
         <label class="event__offer-label" for="event-offer-${offer.id}">
           <span class="event__offer-title">${offer.title}</span>
           &plus;&euro;&nbsp;
@@ -144,48 +162,59 @@ const prepareDestinationDetails = (selectedDestination) => (
   </section>`
 );
 
-const prepareSaveButton = () => '<button class="event__save-btn  btn  btn--blue" type="submit">Save</button>';
+const prepareSaveButton = (isSaving, isDisabled) => (`<button class="event__save-btn  btn  btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>`);
 
-const prepareResetButton = (isNewPoint) => {
-  const buttonText = (isNewPoint) ? 'Cancel' : 'Delete' ;
+const prepareResetButton = (isNewPoint, isDeleting, isDisabled) => {
+  const deleteButtonText = isDeleting ? 'Deleting...' : 'Delete' ;
+  const buttonText = isNewPoint ? 'Cancel' : deleteButtonText ;
 
-  return `<button class="event__reset-btn" type="reset">${buttonText}</button>`;
+  return `<button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${buttonText}</button>`;
 };
 
-const prepareRollUpButton = (isNewPoint) => {
+const prepareRollUpButton = (isNewPoint, isDisabled) => {
   if (isNewPoint) {
     return '';
   }
 
-  return '<button class="event__rollup-btn" type="button">';
+  return (
+    `<button class="event__rollup-btn" type="button" ${isDisabled ? 'disabled' : ''}>
+    <span class="visually-hidden">Open event</span>
+    </button>`
+  );
 };
 
 const createPointEditTemplate = (point, offers, destinations) => {
-  const isNewPoint = point.id === null;
-  const { type: selectedType, offers: selectedOffers } = point;
-  const selectedDestination = destinations.find((item) => item.id === point.destination);
-  const { offers: offersBySelectedType } = offers.find((item) => item.type === point.type);
+  const isNewPoint = point.id === null || point.id === undefined;
+  const {
+    dateFrom,
+    dateTo,
+    type,
+    destination,
+    basePrice,
+    offers: selectedOffers,
+    isDisabled,
+    isSaving,
+    isDeleting
+  } = point;
+  const selectedDestination = destinations.find((item) => item.id === destination);
+  const { offers: availableOffers } = offers.find((item) => item.type === type);
 
   return (
     `<li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
         <header class="event__header">
-          <div class="event__type-wrapper">
-            ${prepareWrapperTypesList(selectedType, offers)}
-          </div>
+          ${prepareWrapperTypesList(type, offers, isDisabled)}
 
-          ${prepareDestinationField(selectedType, selectedDestination, destinations)}
-          ${prepareTimeField(point.dateFrom, point.dateTo)}
-          ${preparePrice(point.basePrice)}
+          ${prepareDestinationField(type, selectedDestination, destinations, isDisabled)}
+          ${prepareTimeField(dateFrom, dateTo, isDisabled)}
+          ${preparePrice(basePrice, isDisabled)}
   
-          ${prepareSaveButton()}
-          ${prepareResetButton(isNewPoint)}
-          ${prepareRollUpButton(isNewPoint)}
-            <span class="visually-hidden">Open event</span>
-          </button>
+          ${prepareSaveButton(isSaving, isDisabled)}
+          ${prepareResetButton(isNewPoint, isDeleting, isDisabled)}
+          ${prepareRollUpButton(isNewPoint, isDisabled)}
         </header>
         <section class="event__details">
-          ${prepareOffers(selectedOffers, offersBySelectedType)}
+          ${prepareOffers(selectedOffers, availableOffers, isDisabled)}
           ${prepareDestinationDetails(selectedDestination)}
         </section>
       </form>
@@ -268,7 +297,7 @@ export default class PointEditView extends AbstractStatefulView {
         'time_24hr': true,
         dateFormat: 'd/m/y H:i',
         defaultDate: this._state.dateFrom,
-        onChange: this.#startDateChangeHandler,
+        onClose: this.#startDateChangeHandler,
       },
     );
 
@@ -279,7 +308,7 @@ export default class PointEditView extends AbstractStatefulView {
         'time_24hr': true,
         dateFormat: 'd/m/y H:i',
         defaultDate: this._state.dateTo,
-        onChange: this.#endDateChangeHandler,
+        onClose: this.#endDateChangeHandler,
       },
     );
   };
@@ -357,7 +386,22 @@ export default class PointEditView extends AbstractStatefulView {
 
   };
 
-  static parsePointToState = (point) => ({...point});
+  static parsePointToState = (point) => (
+    {
+      ...point,
+      isDisabled: false,
+      isSaving: false,
+      isDeleting: false,
+    }
+  );
 
-  static parseStateToPoint = (state) => ({...state});
+  static parseStateToPoint = (state) => {
+    const point = {...state};
+
+    delete point.isDisabled;
+    delete point.isSaving;
+    delete point.isDeleting;
+
+    return point;
+  };
 }
