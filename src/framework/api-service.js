@@ -3,12 +3,27 @@
  */
 export default class ApiService {
   /**
+   * Методы запросов
+   */
+  #method = {
+    GET: 'GET',
+    PUT: 'PUT',
+  };
+
+  /**
    * @param {string} endPoint Адрес сервера
    * @param {string} authorization Авторизационный токен
    */
   constructor(endPoint, authorization) {
     this._endPoint = endPoint;
     this._authorization = authorization;
+  }
+
+  /**
+   * Метод для получения методов запросов
+   */
+  get method () {
+    return this.#method;
   }
 
   /**
@@ -22,7 +37,7 @@ export default class ApiService {
    */
   _load = async ({
     url,
-    method = 'GET',
+    method = this.#method.GET,
     body = null,
     headers = new Headers(),
   }) => {
