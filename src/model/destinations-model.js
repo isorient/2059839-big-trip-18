@@ -1,9 +1,33 @@
-import {createDestination} from '../chmock/destinations.js';
+import {
+  UpdateType,
+  DataSource
+} from '../constants.js';
 
-export default class DestinationsModel {
-  #destinations = Array.from({length:7}, (_,index) => createDestination(index));
+import Observable from '../framework/observable.js';
+
+export default class DestinationsModel extends Observable {
+  #destinations = null;
+  #destinationsApiService = null;
+
+  constructor (destinationsApiService) {
+    super();
+    this.#destinationsApiService = destinationsApiService;
+  }
 
   get destinations() {
     return this.#destinations;
   }
+
+  init = async () => {
+    try {
+      const destinations = await this.#destinationsApiService.destinations;
+      this.#destinations = destinations.map(this.#adaptToClient);
+    } catch (err) {
+      this.#destinations = [];
+    }
+
+    this._notify(UpdateType.INIT, undefined, DataSource.DESTINATIONS);
+  };
+
+  #adaptToClient = (destination) => ({...destination});
 }

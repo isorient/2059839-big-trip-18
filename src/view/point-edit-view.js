@@ -1,9 +1,4 @@
 import {
-  POINT_TYPES,
-  DESTINATIONS_LIST
-} from '../constants.js';
-
-import {
   getPrettyDatetime,
   getCurrentDatetime
 } from '../utils/dates.js';
@@ -15,26 +10,26 @@ import 'flatpickr/dist/flatpickr.min.css';
 
 const BLANK_POINT = {
   'id': null,
-  'type': POINT_TYPES[0],
+  'type': 'flight',
   'dateFrom': getCurrentDatetime(),
   'dateTo': getCurrentDatetime(),
-  'destination': 0,
+  'destination': 1,
   'basePrice': '',
   'isFavorite': false,
   'offers': []
 };
 
-const prepareWrapperTypesList = (selectedType) => {
-  const typeElement = POINT_TYPES.map(
-    (eventType) => {
-      const isChecked = eventType === selectedType
+const prepareWrapperTypesList = (selectedType, offers) => {
+  const typeElement = offers.map(
+    (offerItem) => {
+      const isChecked = offerItem.type === selectedType
         ? 'checked'
         : '';
 
       return (
         `<div class="event__type-item">
-          <input id="event-type-${eventType}-1" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${eventType}" ${isChecked}>
-          <label class="event__type-label  event__type-label--${eventType}" for="event-type-${eventType}-1">${eventType}</label>
+          <input id="event-type-${offerItem.type}" class="event__type-input  visually-hidden" type="radio" name="event-type" value="${offerItem.type}" ${isChecked}>
+          <label class="event__type-label  event__type-label--${offerItem.type}" for="event-type-${offerItem.type}">${offerItem.type}</label>
         </div>`
       );
     }
@@ -42,11 +37,11 @@ const prepareWrapperTypesList = (selectedType) => {
     .join('');
 
   return (
-    `<label class="event__type  event__type-btn" for="event-type-toggle-1">
+    `<label class="event__type  event__type-btn" for="event-type-toggle">
       <span class="visually-hidden">Choose event type</span>
       <img class="event__type-icon" width="17" height="17" src="img/icons/${selectedType}.png" alt="Event type icon">
     </label>
-    <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
+    <input class="event__type-toggle  visually-hidden" id="event-type-toggle" type="checkbox">
 
     <div class="event__type-list">
       <fieldset class="event__type-group">
@@ -57,15 +52,15 @@ const prepareWrapperTypesList = (selectedType) => {
   );
 };
 
-const prepareDestinationList = (selectedDestinationName) => DESTINATIONS_LIST.map((item) => `<option value="${item}" ${item === selectedDestinationName ? 'selected' : ''}>${item}</option>`).join('');
+const prepareDestinationList = (selectedDestinationName, destinations) => destinations.map((destinationItem) => `<option value="${destinationItem.name}" ${destinationItem.name === selectedDestinationName ? 'selected' : ''}>${destinationItem.name}</option>`).join('');
 
-const prepareDestinationField = (eventType, selectedDestination) => (
+const prepareDestinationField = (pointType, selectedDestination, destinations) => (
   `<div class="event__field-group  event__field-group--destination">
     <label class="event__label  event__type-output" for="event-destination-1">
-      ${eventType}
+      ${pointType}
     </label>
     <select class="event__input  event__input--destination" id="event-destination-1" name="event-destination" value="${selectedDestination.name}">
-    ${prepareDestinationList(selectedDestination.name)}
+    ${prepareDestinationList(selectedDestination.name, destinations)}
     </select>
   </div>`
 );
@@ -86,56 +81,59 @@ const preparePrice = (price) => (
     <span class="visually-hidden">Price</span>
     &euro;
   </label>
-  <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}">
+  <input class="event__input  event__input--price" id="event-price-1" type="number" name="event-price" value="${price}" min="0">
   </div>`
 );
 
 const prepareOffers = (selectedOffers, offersBySelectedType) => {
-  if (offersBySelectedType.length > 0) {
-    const offerElement = offersBySelectedType.map((offer) => {
-      const isChecked = selectedOffers.includes(offer.id)
-        ? 'checked'
-        : '';
-
-      return (
-        `<div class="event__offer-selector">
-          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${isChecked}>
-          <label class="event__offer-label" for="event-offer-${offer.id}">
-            <span class="event__offer-title">${offer.title}</span>
-            &plus;&euro;&nbsp;
-            <span class="event__offer-price">${offer.price}</span>
-          </label>
-        </div>`
-      );
-    }
-    )
-      .join('');
-
-    return (
-      `<section class="event__section  event__section--offers">
-      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-        <div class="event__available-offers">
-          ${offerElement}
-        </div>
-      </section>`
-    );
+  if (offersBySelectedType.length === 0 || offersBySelectedType === null || offersBySelectedType === undefined) {
+    return '';
   }
-};
 
-const prepareDestinationPhoto = (destinationPhoto) => {
-  if (destinationPhoto.length > 0) {
-    const photoElement = destinationPhoto.map( (item) => (`<img class="event__photo" src="${item.src}" alt="${item.description}"></img>`)
-    )
-      .join('');
+  const offerElement = offersBySelectedType.map((offer) => {
+    const isChecked = selectedOffers.includes(offer.id)
+      ? 'checked'
+      : '';
+
     return (
-      `<div class="event__photos-container">
-        <div class="event__photos-tape">
-          ${photoElement}
-        </div>
+      `<div class="event__offer-selector">
+        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${isChecked}>
+        <label class="event__offer-label" for="event-offer-${offer.id}">
+          <span class="event__offer-title">${offer.title}</span>
+          &plus;&euro;&nbsp;
+          <span class="event__offer-price">${offer.price}</span>
+        </label>
       </div>`
     );
   }
+  )
+    .join('');
+
+  return (
+    `<section class="event__section  event__section--offers">
+    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+
+      <div class="event__available-offers">
+        ${offerElement}
+      </div>
+    </section>`
+  );
+};
+
+const prepareDestinationPhoto = (photosList) => {
+  if (photosList.length === 0 || photosList === null || photosList === undefined) {
+    return '';
+  }
+
+  const photoElement = photosList.map( (item) => (`<img class="event__photo" src="${item.src}" alt="${item.description}"></img>`))
+    .join('');
+  return (
+    `<div class="event__photos-container">
+      <div class="event__photos-tape">
+        ${photoElement}
+      </div>
+    </div>`
+  );
 };
 
 const prepareDestinationDetails = (selectedDestination) => (
@@ -146,34 +144,43 @@ const prepareDestinationDetails = (selectedDestination) => (
   </section>`
 );
 
-const prepareRollUpButton = (pointId) => {
-  if (pointId === null) {
+const prepareSaveButton = () => '<button class="event__save-btn  btn  btn--blue" type="submit">Save</button>';
+
+const prepareResetButton = (isNewPoint) => {
+  const buttonText = (isNewPoint) ? 'Cancel' : 'Delete' ;
+
+  return `<button class="event__reset-btn" type="reset">${buttonText}</button>`;
+};
+
+const prepareRollUpButton = (isNewPoint) => {
+  if (isNewPoint) {
     return '';
   }
 
   return '<button class="event__rollup-btn" type="button">';
 };
 
-const createPointEditTemplate = (point, offersData, destinationData) => {
+const createPointEditTemplate = (point, offers, destinations) => {
+  const isNewPoint = point.id === null;
   const { type: selectedType, offers: selectedOffers } = point;
-  const selectedDestination = destinationData.find((item) => item.id === point.destination);
-  const { offers: offersBySelectedType } = offersData.find((item) => item.type === point.type);
+  const selectedDestination = destinations.find((item) => item.id === point.destination);
+  const { offers: offersBySelectedType } = offers.find((item) => item.type === point.type);
 
   return (
     `<li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
         <header class="event__header">
           <div class="event__type-wrapper">
-            ${prepareWrapperTypesList(selectedType)}
+            ${prepareWrapperTypesList(selectedType, offers)}
           </div>
 
-          ${prepareDestinationField(selectedType, selectedDestination)}
+          ${prepareDestinationField(selectedType, selectedDestination, destinations)}
           ${prepareTimeField(point.dateFrom, point.dateTo)}
           ${preparePrice(point.basePrice)}
   
-          <button class="event__save-btn  btn  btn--blue" type="submit">Save</button>
-          <button class="event__reset-btn" type="reset">Delete</button>
-          ${prepareRollUpButton(point.id)}
+          ${prepareSaveButton()}
+          ${prepareResetButton(isNewPoint)}
+          ${prepareRollUpButton(isNewPoint)}
             <span class="visually-hidden">Open event</span>
           </button>
         </header>
@@ -218,7 +225,7 @@ export default class PointEditView extends AbstractStatefulView {
 
   setFormClickHandler = (callback) => {
     this._callback.formClick = callback;
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#formClickHandler);
+    this.element.querySelector('.event__rollup-btn')?.addEventListener('click', this.#formClickHandler);
   };
 
   reset = (point) => {
@@ -250,7 +257,7 @@ export default class PointEditView extends AbstractStatefulView {
     this.element.querySelector('.event__type-list').addEventListener('click', this.#typeListClickHandler);
     this.element.querySelector('.event__input--destination').addEventListener('input', this.#destinationInputHandler);
     this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChangeHandler);
-    this.element.querySelector('.event__available-offers').addEventListener('click', this.#offersClickHandler);
+    this.element.querySelector('.event__available-offers')?.addEventListener('click', this.#offersClickHandler);
   };
 
   #setDatepicker = () => {
