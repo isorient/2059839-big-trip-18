@@ -1,6 +1,8 @@
 import {
   FilterType,
-  SortType
+  SortType,
+  UpdateType,
+  DataSource
 } from '../constants.js';
 import {
   isPointInThePast,
@@ -8,8 +10,6 @@ import {
   getDatetimeDuration,
   compareDates
 } from '../utils/dates.js';
-
-import createPoint from '../chmock/points.js';
 
 import Observable from '../framework/observable.js';
 
@@ -35,12 +35,18 @@ const sortPointsByTimeDesc = (targetPoint, pointToCompare) => {
   return pointToCompareDuration.$ms - targetPointDuration.$ms;
 };
 
-const sortPointsByPriceDesc = (targetPoint, pointToCompare) => pointToCompare.basePrice - targetPoint.basePrice;
+const sortPointsByPriceDesc = (targetPoint, pointToCompare) => Number(pointToCompare.basePrice - targetPoint.basePrice);
 
 export default class PointsModel extends Observable {
-  #rawPoints = Array.from({length:5}, (_,index) => createPoint(index));
+  #rawPoints = [];
   #filteredPoints = filter[FilterType.EVERYTHING](this.#rawPoints);
-  #pointsDefaultSortOrder = this.#filteredPoints.sort(sortPointsByDateAsc);
+  #pointsDefaultSortOrder = PointsModel.sortPoints;
+  #pointsApiService = null;
+
+  constructor (pointsApiService) {
+    super();
+    this.#pointsApiService = pointsApiService;
+  }
 
   get points() {
     return this.#pointsDefaultSortOrder;
@@ -49,6 +55,17 @@ export default class PointsModel extends Observable {
   get filterLabels() {
     return filterPoints(this.#rawPoints);
   }
+
+  init = async () => {
+    try {
+      const points = await this.#pointsApiService.points;
+      this.#rawPoints = points.map(this.#adaptToClient);
+    } catch (err) {
+      this.#rawPoints = [];
+    }
+
+    this._notify(UpdateType.INIT, undefined, DataSource.POINTS);
+  };
 
   sortPoints = (sortType = sortPointsByDateAsc) => {
     switch (sortType) {
@@ -66,20 +83,26 @@ export default class PointsModel extends Observable {
     return this.#filteredPoints;
   };
 
-  updatePoints = (updateType, updatedPoint) => {
+  updatePoint = async (updateType, updatedPoint) => {
     const index = this.#rawPoints.findIndex((task) => task.id === updatedPoint.id);
 
     if (index === -1) {
       throw new Error('Can\'t update unexisting task');
     }
 
-    this.#rawPoints = [
-      ...this.#rawPoints.slice(0, index),
-      updatedPoint,
-      ...this.#rawPoints.slice(index + 1),
-    ];
+    try {
+      const response = await this.#pointsApiService.updatePoint(updatedPoint);
+      const changedPoint = this.#adaptToClient(response);
+      this.#rawPoints = [
+        ...this.#rawPoints.slice(0, index),
+        changedPoint,
+        ...this.#rawPoints.slice(index + 1),
+      ];
 
-    this._notify(updateType, updatedPoint);
+      this._notify(updateType, changedPoint);
+    } catch(err) {
+      throw new Error('Can\'t update point');
+    }
   };
 
   addPoint = (updateType, updatedPoint) => {
@@ -95,7 +118,7 @@ export default class PointsModel extends Observable {
     const index = this.#rawPoints.findIndex((task) => task.id === updatedPoint.id);
 
     if (index === -1) {
-      throw new Error('Can\'t delete unexisting task');
+      throw new Error('Can\'t delete unexisting point');
     }
 
     this.#rawPoints = [
@@ -104,5 +127,21 @@ export default class PointsModel extends Observable {
     ];
 
     this._notify(updateType);
+  };
+
+  #adaptToClient = (point) => {
+    const adaptedPoint = {...point,
+      basePrice: point['base_price'],
+      dateFrom: new Date(point['date_from']),
+      dateTo: new Date(point['date_to']),
+      isFavorite: point['is_favorite'],
+    };
+
+    delete adaptedPoint['base_price'];
+    delete adaptedPoint['date_from'];
+    delete adaptedPoint['date_to'];
+    delete adaptedPoint['is_favorite'];
+
+    return adaptedPoint;
   };
 }

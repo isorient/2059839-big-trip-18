@@ -1,24 +1,3 @@
-const POINT_TYPES = [
-  'taxi',
-  'bus',
-  'train',
-  'ship',
-  'drive',
-  'flight',
-  'check-in',
-  'sightseeing',
-  'restaurant'
-];
-
-const DESTINATIONS_LIST = [
-  'Chamonix',
-  'Amsterdam',
-  'Geneva',
-  'Loloburg',
-  'Kekland',
-  'Zorroville'
-];
-
 const FilterType = {
   EVERYTHING:'everything',
   PAST:'past',
@@ -41,13 +20,19 @@ const UpdateType = {
   PATCH: 'PATCH',
   MINOR: 'MINOR',
   MAJOR: 'MAJOR',
+  INIT: 'INIT'
+};
+
+const DataSource = {
+  POINTS: 'POINTS',
+  OFFERS: 'OFFERS',
+  DESTINATIONS: 'DESTINATIONS',
 };
 
 export {
-  POINT_TYPES,
-  DESTINATIONS_LIST,
   FilterType,
   SortType,
   UserAction,
-  UpdateType
+  UpdateType,
+  DataSource
 };

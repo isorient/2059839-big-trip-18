@@ -9,9 +9,7 @@ import {
   remove
 } from '../framework/render.js';
 import {isEscPressed} from '../utils/common.js';
-import {
-  areDatesEqual
-} from '../utils/dates.js';
+import {areDatesEqual} from '../utils/dates.js';
 
 import PointEditView from '../view/point-edit-view.js';
 import PointView from '../view/point-view.js';
@@ -48,14 +46,11 @@ export default class PointPresenter {
     const prevPointEditComponent = this.#pointEditComponent;
 
     this.#pointComponent = new PointView(this.#point, this.#offers, this.#destinations);
-    this.#pointEditComponent = new PointEditView(this.#point, this.#offers, this.#destinations);
 
     this.#pointComponent.setEditClickHandler(this.#handleEditClick);
     this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
 
-    this.#pointEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
-    this.#pointEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
-    this.#pointEditComponent.setFormClickHandler(this.#handleFormClick);
+    this.#initEditForm();
 
     if (prevPointComponent === null || prevPointEditComponent === null) {
       render(this.#pointComponent, this.#pointListContainer);
@@ -86,6 +81,14 @@ export default class PointPresenter {
     }
   };
 
+  #initEditForm = () => {
+    this.#pointEditComponent = new PointEditView(this.#point, this.#offers, this.#destinations);
+
+    this.#pointEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
+    this.#pointEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
+    this.#pointEditComponent.setFormClickHandler(this.#handleFormClick);
+  };
+
   #replacePointByEditForm = () => {
     replace(this.#pointEditComponent, this.#pointComponent);
     document.addEventListener('keydown', this.#escKeyDownHandler);
@@ -108,12 +111,11 @@ export default class PointPresenter {
   };
 
   #handleEditClick = () => {
+    this.#initEditForm();
     this.#replacePointByEditForm();
   };
 
   #handleFormSubmit = (point) => {
-    // Проверяем, поменялись ли в задаче данные, которые попадают под фильтрацию,
-    // а значит требуют перерисовки списка - если таких нет, это PATCH-обновление
     const isMinorUpdate = !areDatesEqual(point.dateFrom, this.#point.dateFrom) || !areDatesEqual(point.dateTo, this.#point.dateTo) || point.basePrice !== this.#point.basePrice;
 
     this.#changeDataHandler(

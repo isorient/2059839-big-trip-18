@@ -26,8 +26,11 @@ export default class Observable {
    * @param {*} event Тип события
    * @param {*} payload Дополнительная информация
    */
-  _notify(event, payload) {
-    this.#observers.forEach((observer) => observer(event, payload));
+  _notify(event, payload, additionalData) {
+    this.#observers.forEach((observer) => {
+      observer(event, payload, additionalData);
+    }
+    );
   }
 }
 
@@ -36,4 +39,5 @@ export default class Observable {
  * @callback observerCallback
  * @param {*} event Тип события
  * @param {*} [payload] Дополнительная информация
+ * @param {*} additionalData Дополнительная информация
  */
