@@ -10,13 +10,13 @@ import PointsApiService from './api/points-api-service.js';
 import OffersApiService from './api/offers-api-service.js';
 import DestinationsApiService from './api/destinations-api-service.js';
 
+const AUTHORIZATION = 'Basic jv54vUVvkBk7tPTO';
+const END_POINT = 'https://18.ecmascript.pages.academy/big-trip';
+
 const tripInfoContainerElement = document.querySelector('.trip-main');
 const filterContainerElement = tripInfoContainerElement.querySelector('.trip-controls__filters');
 const tripContainerElement = document.querySelector('.trip-events');
 const addPointButtonElement = tripInfoContainerElement.querySelector('.trip-main__event-add-btn');
-
-const AUTHORIZATION = 'Basic jv54vUVvkBk7tPTO';
-const END_POINT = 'https://18.ecmascript.pages.academy/big-trip';
 
 const pointsApiService = new PointsApiService(END_POINT, AUTHORIZATION);
 const offersApiService = new OffersApiService(END_POINT, AUTHORIZATION);
