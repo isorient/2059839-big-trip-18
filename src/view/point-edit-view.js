@@ -1,6 +1,8 @@
 import {
   getPrettyDatetime,
-  getCurrentDatetime
+  getStartDatetime,
+  getEndDatetime,
+  getDatesDifference
 } from '../utils/dates.js';
 
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
@@ -11,8 +13,8 @@ import 'flatpickr/dist/flatpickr.min.css';
 const BLANK_POINT = {
   'id': null,
   'type': 'flight',
-  'dateFrom': getCurrentDatetime(),
-  'dateTo': getCurrentDatetime(),
+  'dateFrom': getStartDatetime(),
+  'dateTo': getEndDatetime(),
   'destination': 1,
   'basePrice': '',
   'isFavorite': false,
@@ -313,12 +315,28 @@ export default class PointEditView extends AbstractStatefulView {
     this.updateElement({
       dateFrom: userDate,
     });
+
+    const datesDifference = getDatesDifference(this._state.dateTo, this._state.dateFrom);
+
+    if (datesDifference < 0) {
+      this.updateElement({
+        dateTo: getEndDatetime(this._state.dateFrom),
+      });
+    }
+
   };
 
   #onEndDateChange = ([userDate]) => {
     this.updateElement({
       dateTo: userDate,
     });
+
+    const datesDifference = getDatesDifference(this._state.dateTo, this._state.dateFrom);
+    if (datesDifference < 0) {
+      this.updateElement({
+        dateFrom: this._state.dateTo,
+      });
+    }
   };
 
   #onFormSubmit = (evt) => {

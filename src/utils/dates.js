@@ -14,7 +14,8 @@ const getPrettyDate = (eventPeriod) => dayjs(eventPeriod).format('MMM D');
 const getPrettyTime = (eventPeriod) => dayjs(eventPeriod).format('HH:mm');
 const getPrettyDatetime = (eventPeriod) => dayjs(eventPeriod).format('DD/MM/YY HH:mm');
 
-const getCurrentDatetime = () => dayjs().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+const getStartDatetime = (date) => dayjs(date).add(1,'h').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+const getEndDatetime = (date) => dayjs(date).add(2,'h').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 
 const getDatesDifference = (targetDate, dateToCompare, format = 'minute') => dayjs(targetDate).diff(dayjs(dateToCompare), format);
 
@@ -44,7 +45,8 @@ export {
   getPrettyDate,
   getPrettyTime,
   getPrettyDatetime,
-  getCurrentDatetime,
+  getStartDatetime,
+  getEndDatetime,
   getDatetimeDuration,
   getFormattedDatetimeDuration,
   isPointInThePast,
