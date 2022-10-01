@@ -21,7 +21,7 @@ const Mode = {
 
 export default class PointPresenter {
   #pointListContainer = null;
-  #changeDataHandler = null;
+  #onDataChange = null;
   #changeMode = null;
 
   #point = null;
@@ -32,9 +32,9 @@ export default class PointPresenter {
   #pointComponent = null;
   #pointEditComponent = null;
 
-  constructor (pointListContainer, changeDataHandler, changeMode) {
+  constructor (pointListContainer, onDataChange, changeMode) {
     this.#pointListContainer = pointListContainer;
-    this.#changeDataHandler = changeDataHandler;
+    this.#onDataChange = onDataChange;
     this.#changeMode = changeMode;
   }
 
@@ -47,8 +47,8 @@ export default class PointPresenter {
 
     this.#pointComponent = new PointView(this.#point, this.#offers, this.#destinations);
 
-    this.#pointComponent.setEditClickHandler(this.#handleEditClick);
-    this.#pointComponent.setFavoriteClickHandler(this.#handleFavoriteClick);
+    this.#pointComponent.setEditClickHandler(this.#onEditClick);
+    this.#pointComponent.setFavoriteClickHandler(this.#onFavoriteClick);
 
     this.#initEditForm();
 
@@ -120,25 +120,25 @@ export default class PointPresenter {
   #initEditForm = () => {
     this.#pointEditComponent = new PointEditView(this.#point, this.#offers, this.#destinations);
 
-    this.#pointEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
-    this.#pointEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
-    this.#pointEditComponent.setFormClickHandler(this.#handleFormClick);
+    this.#pointEditComponent.setFormSubmitHandler(this.#onFormSubmit);
+    this.#pointEditComponent.setDeleteClickHandler(this.#onDeleteClick);
+    this.#pointEditComponent.setFormClickHandler(this.#onFormClick);
   };
 
   #replacePointByEditForm = () => {
     replace(this.#pointEditComponent, this.#pointComponent);
-    document.addEventListener('keydown', this.#escKeyDownHandler);
+    document.addEventListener('keydown', this.#onEscKeyDown);
     this.#changeMode();
     this.#mode = Mode.EDITING;
   };
 
   #replaceEditFormByPoint = () => {
     replace(this.#pointComponent, this.#pointEditComponent);
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    document.removeEventListener('keydown', this.#onEscKeyDown);
     this.#mode = Mode.DEFAULT;
   };
 
-  #escKeyDownHandler = (evt) => {
+  #onEscKeyDown = (evt) => {
     if(isEscPressed(evt)) {
       evt.preventDefault();
       this.#pointEditComponent.reset(this.#point);
@@ -146,36 +146,36 @@ export default class PointPresenter {
     }
   };
 
-  #handleEditClick = () => {
+  #onEditClick = () => {
     this.#initEditForm();
     this.#replacePointByEditForm();
   };
 
-  #handleFormSubmit = (point) => {
+  #onFormSubmit = (point) => {
     const isMinorUpdate = !areDatesEqual(point.dateFrom, this.#point.dateFrom) || !areDatesEqual(point.dateTo, this.#point.dateTo) || point.basePrice !== this.#point.basePrice;
 
-    this.#changeDataHandler(
+    this.#onDataChange(
       UserAction.UPDATE_POINT,
       isMinorUpdate ? UpdateType.MINOR : UpdateType.PATCH,
       point
     );
   };
 
-  #handleDeleteClick = (point) => {
-    this.#changeDataHandler(
+  #onDeleteClick = (point) => {
+    this.#onDataChange(
       UserAction.DELETE_POINT,
       UpdateType.MINOR,
       point
     );
   };
 
-  #handleFormClick = (point) => {
-    this.#changeDataHandler(point);
+  #onFormClick = (point) => {
+    this.#onDataChange(point);
     this.#replaceEditFormByPoint();
   };
 
-  #handleFavoriteClick = () => {
-    this.#changeDataHandler(
+  #onFavoriteClick = () => {
+    this.#onDataChange(
       UserAction.UPDATE_POINT,
       UpdateType.MINOR,
       {...this.#point, isFavorite:!this.#point.isFavorite}

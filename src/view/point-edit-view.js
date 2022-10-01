@@ -21,13 +21,9 @@ const BLANK_POINT = {
 
 const formFieldSetting = {
   price:{
-    isRequired:true,
-    minValue:0
+    isRequired: true,
+    minValue: 0
   },
-  dateTo:{
-    minValue: getCurrentDatetime(),
-  }
-
 };
 
 const prepareWrapperTypesList = (selectedType, offers, isDisabled) => {
@@ -244,17 +240,17 @@ export default class PointEditView extends AbstractStatefulView {
 
   setFormSubmitHandler = (callback) => {
     this._callback.formSubmit = callback;
-    this.element.querySelector('form').addEventListener('submit', this.#formSubmitHandler);
+    this.element.querySelector('form').addEventListener('submit', this.#onFormSubmit);
   };
 
   setDeleteClickHandler = (callback) => {
     this._callback.deleteClick = callback;
-    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#formDeleteClickHandler);
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#onFormDeleteClick);
   };
 
   setFormClickHandler = (callback) => {
     this._callback.formClick = callback;
-    this.element.querySelector('.event__rollup-btn')?.addEventListener('click', this.#formClickHandler);
+    this.element.querySelector('.event__rollup-btn')?.addEventListener('click', this.#onFormClick);
   };
 
   reset = (point) => {
@@ -283,10 +279,10 @@ export default class PointEditView extends AbstractStatefulView {
   };
 
   #setInnerHandlers = () => {
-    this.element.querySelector('.event__type-list').addEventListener('click', this.#typeListClickHandler);
-    this.element.querySelector('.event__input--destination').addEventListener('input', this.#destinationInputHandler);
-    this.element.querySelector('.event__input--price').addEventListener('change', this.#priceChangeHandler);
-    this.element.querySelector('.event__available-offers')?.addEventListener('click', this.#offersClickHandler);
+    this.element.querySelector('.event__type-list').addEventListener('click', this.#onTypeListClick);
+    this.element.querySelector('.event__input--destination').addEventListener('input', this.#onDestinationChange);
+    this.element.querySelector('.event__input--price').addEventListener('change', this.#onPriceChange);
+    this.element.querySelector('.event__available-offers')?.addEventListener('click', this.#onOffersClick);
   };
 
   #setDatepicker = () => {
@@ -297,7 +293,7 @@ export default class PointEditView extends AbstractStatefulView {
         'time_24hr': true,
         dateFormat: 'd/m/y H:i',
         defaultDate: this._state.dateFrom,
-        onClose: this.#startDateChangeHandler,
+        onClose: this.#onStartDateChange,
       },
     );
 
@@ -308,39 +304,39 @@ export default class PointEditView extends AbstractStatefulView {
         'time_24hr': true,
         dateFormat: 'd/m/y H:i',
         defaultDate: this._state.dateTo,
-        onClose: this.#endDateChangeHandler,
+        onClose: this.#onEndDateChange,
       },
     );
   };
 
-  #startDateChangeHandler = ([userDate]) => {
+  #onStartDateChange = ([userDate]) => {
     this.updateElement({
       dateFrom: userDate,
     });
   };
 
-  #endDateChangeHandler = ([userDate]) => {
+  #onEndDateChange = ([userDate]) => {
     this.updateElement({
       dateTo: userDate,
     });
   };
 
-  #formSubmitHandler = (evt) => {
+  #onFormSubmit = (evt) => {
     evt.preventDefault();
     this._callback.formSubmit(PointEditView.parseStateToPoint(this._state));
   };
 
-  #formDeleteClickHandler = (evt) => {
+  #onFormDeleteClick = (evt) => {
     evt.preventDefault();
     this._callback.deleteClick(PointEditView.parseStateToPoint(this._state));
   };
 
-  #formClickHandler = (evt) => {
+  #onFormClick = (evt) => {
     evt.preventDefault();
     this._callback.formClick(PointEditView.parseStateToPoint(this._state));
   };
 
-  #typeListClickHandler = (evt) => {
+  #onTypeListClick = (evt) => {
     if (evt.target.tagName !== 'INPUT') {
       return;
     }
@@ -350,7 +346,7 @@ export default class PointEditView extends AbstractStatefulView {
     });
   };
 
-  #destinationInputHandler = (evt) => {
+  #onDestinationChange = (evt) => {
     const newDestination = this.#destinationData.find((item) => item.name === evt.target.value);
     if (newDestination !== undefined) {
       this.updateElement({
@@ -359,13 +355,13 @@ export default class PointEditView extends AbstractStatefulView {
     }
   };
 
-  #priceChangeHandler = (evt) => {
+  #onPriceChange = (evt) => {
     this._setState({
       basePrice: Number(evt.target.value),
     });
   };
 
-  #offersClickHandler = (evt) => {
+  #onOffersClick = (evt) => {
     if (evt.target.tagName !== 'INPUT'){
       return;
     }

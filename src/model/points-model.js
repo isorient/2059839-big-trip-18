@@ -8,7 +8,7 @@ import {
   isPointInThePast,
   isPointInTheFuture,
   getDatetimeDuration,
-  compareDates
+  getDatesDifference
 } from '../utils/dates.js';
 
 import Observable from '../framework/observable.js';
@@ -27,7 +27,7 @@ const filterPoints = (points) => Object.entries(filter).map(
   }),
 );
 
-const sortPointsByDateAsc = (targetPoint, pointToCompare) => compareDates(targetPoint.dateFrom, pointToCompare.dateFrom);
+const sortPointsByDateAsc = (targetPoint, pointToCompare) => getDatesDifference(targetPoint.dateFrom, pointToCompare.dateFrom);
 
 const sortPointsByTimeDesc = (targetPoint, pointToCompare) => {
   const pointToCompareDuration = getDatetimeDuration(pointToCompare.dateFrom, pointToCompare.dateTo);

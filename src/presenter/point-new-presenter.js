@@ -20,12 +20,12 @@ export default class PointNewPresenter {
 
   #pointEditComponent = null;
 
-  #changeDataHandler = null;
+  #onDataChange = null;
   #destroyCallback = null;
 
-  constructor (pointListContainer, changeDataHandler, destroyCallback, offers, destinations) {
+  constructor (pointListContainer, onDataChange, destroyCallback, offers, destinations) {
     this.#pointListContainer = pointListContainer;
-    this.#changeDataHandler = changeDataHandler;
+    this.#onDataChange = onDataChange;
     this.#destroyCallback = destroyCallback;
     this.#offers = offers;
     this.#destinations = destinations;
@@ -37,12 +37,12 @@ export default class PointNewPresenter {
     }
 
     this.#pointEditComponent = new PointEditView(undefined, this.#offers, this.#destinations);
-    this.#pointEditComponent.setFormSubmitHandler(this.#handleFormSubmit);
-    this.#pointEditComponent.setDeleteClickHandler(this.#handleDeleteClick);
+    this.#pointEditComponent.setFormSubmitHandler(this.#onFormSubmit);
+    this.#pointEditComponent.setDeleteClickHandler(this.#onDeleteClick);
 
     render(this.#pointEditComponent, this.#pointListContainer, RenderPosition.AFTERBEGIN);
 
-    document.addEventListener('keydown', this.#escKeyDownHandler);
+    document.addEventListener('keydown', this.#onEscKeyDown);
   };
 
   destroy = () => {
@@ -55,7 +55,7 @@ export default class PointNewPresenter {
     remove(this.#pointEditComponent);
     this.#pointEditComponent = null;
 
-    document.removeEventListener('keydown', this.#escKeyDownHandler);
+    document.removeEventListener('keydown', this.#onEscKeyDown);
   };
 
   setAborting = () => {
@@ -77,23 +77,19 @@ export default class PointNewPresenter {
     });
   };
 
-  #escKeyDownHandler = (evt) => {
+  #onEscKeyDown = (evt) => {
     if(isEscPressed(evt)) {
       evt.preventDefault();
       this.destroy();
     }
   };
 
-  #handleFormSubmit = (point) => {
-    this.#changeDataHandler(
-      UserAction.ADD_POINT,
-      UpdateType.MINOR,
-      point
-    );
+  #onFormSubmit = (point) => {
+    this.#onDataChange( UserAction.ADD_POINT, UpdateType.MINOR, point);
     this.destroy();
   };
 
-  #handleDeleteClick = () => {
+  #onDeleteClick = () => {
     this.destroy();
   };
 }

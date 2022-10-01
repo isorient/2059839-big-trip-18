@@ -15,10 +15,10 @@ import {
 
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
-import PointListView from '../view/point-list-view.js';
+import LoadingView from '../view/loading-view.js';
 import SortView from '../view/sort-view.js';
 import PointEmptyListView from '../view/point-empty-list-view.js';
-import LoadingView from '../view/loading-view.js';
+import PointListView from '../view/point-list-view.js';
 
 import PointPresenter from './point-presenter.js';
 import PointNewPresenter from './point-new-presenter.js';
@@ -31,10 +31,10 @@ export default class TripPresenter {
 
   #tripContainer = null;
 
-  #pointListComponent = new PointListView();
-  #pointEmptyListComponent = null;
-  #sortComponent = null;
   #loadingComponent = new LoadingView();
+  #sortComponent = null;
+  #pointEmptyListComponent = null;
+  #pointListComponent = new PointListView();
 
   #currentSortType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
@@ -76,6 +76,7 @@ export default class TripPresenter {
   createPoint = (destroyCallback) => {
     this.#currentSortType = SortType.DAY;
     this.#filterModel.setFilter(UpdateType.MAJOR, FilterType.EVERYTHING);
+
     this.#pointNewPresenter = new PointNewPresenter(
       this.#pointListComponent.element,
       this.#onViewChange,
@@ -83,6 +84,7 @@ export default class TripPresenter {
       this.#offersModel.offers,
       this.#destinationsModel.destinations
     );
+
     this.#pointNewPresenter.init();
   };
 
@@ -132,24 +134,6 @@ export default class TripPresenter {
     this.#renderSort();
   };
 
-  #updateLoadingStatus = (dataSourceName) => {
-    switch (dataSourceName) {
-      case DataSource.POINTS:
-        this.#arePointsLoaded = true;
-        break;
-      case DataSource.OFFERS:
-        this.#areOffersLoaded = true;
-        break;
-      case DataSource.DESTINATIONS:
-        this.#areDestinationsLoaded = true;
-        break;
-    }
-
-    if (this.#arePointsLoaded && this.#areOffersLoaded && this.#areDestinationsLoaded) {
-      this.#isLoading = false;
-    }
-  };
-
   #clearTripBoard = ({resetSortType = false} = {}) => {
     if (this.#pointNewPresenter !== null) {
       this.#pointNewPresenter.destroy();
@@ -168,6 +152,24 @@ export default class TripPresenter {
 
     if (resetSortType) {
       this.#currentSortType = SortType.DAY;
+    }
+  };
+
+  #updateLoadingStatus = (dataSourceName) => {
+    switch (dataSourceName) {
+      case DataSource.POINTS:
+        this.#arePointsLoaded = true;
+        break;
+      case DataSource.OFFERS:
+        this.#areOffersLoaded = true;
+        break;
+      case DataSource.DESTINATIONS:
+        this.#areDestinationsLoaded = true;
+        break;
+    }
+
+    if (this.#arePointsLoaded && this.#areOffersLoaded && this.#areDestinationsLoaded) {
+      this.#isLoading = false;
     }
   };
 
