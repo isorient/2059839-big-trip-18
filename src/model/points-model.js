@@ -84,10 +84,10 @@ export default class PointsModel extends Observable {
   };
 
   updatePoint = async (updateType, updatedPoint) => {
-    const index = this.#rawPoints.findIndex((task) => task.id === updatedPoint.id);
+    const index = this.#rawPoints.findIndex((point) => point.id === updatedPoint.id);
 
     if (index === -1) {
-      throw new Error('Can\'t update unexisting task');
+      throw new Error('Can\'t update unexisting point');
     }
 
     try {
@@ -117,7 +117,7 @@ export default class PointsModel extends Observable {
   };
 
   deletePoint = async (updateType, pointToDelete) => {
-    const index = this.#rawPoints.findIndex((task) => task.id === pointToDelete.id);
+    const index = this.#rawPoints.findIndex((point) => point.id === pointToDelete.id);
     if (index === -1) {
       throw new Error('Can\'t delete unexisting point');
     }
@@ -130,7 +130,7 @@ export default class PointsModel extends Observable {
       ];
       this._notify(updateType);
     } catch(err) {
-      throw new Error('Can\'t delete task');
+      throw new Error('Can\'t delete point');
     }
   };
 

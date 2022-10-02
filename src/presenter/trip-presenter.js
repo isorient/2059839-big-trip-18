@@ -191,7 +191,7 @@ export default class TripPresenter {
     }
 
     this.#currentSortType = sortType;
-    this.#clearTripBoard({resetRenderedTaskCount: true});
+    this.#clearTripBoard();
     this.#renderTripBoard();
   };
 
