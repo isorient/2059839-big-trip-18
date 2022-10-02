@@ -102,60 +102,68 @@ const preparePrice = (price, isDisabled) => (
 );
 
 const prepareOffers = (selectedOffers, availableOffers, isDisabled) => {
-  if (availableOffers.length === 0 || availableOffers === null || availableOffers === undefined) {
-    return '';
-  }
+  if (availableOffers && availableOffers.length > 0) {
+    const offerElement = availableOffers.map((offer) => {
+      const isChecked = selectedOffers.includes(offer.id)
+        ? 'checked'
+        : '';
 
-  const offerElement = availableOffers.map((offer) => {
-    const isChecked = selectedOffers.includes(offer.id)
-      ? 'checked'
-      : '';
+      return (
+        `<div class="event__offer-selector">
+          <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${isChecked} ${isDisabled ? 'disabled' : ''}>
+          <label class="event__offer-label" for="event-offer-${offer.id}">
+            <span class="event__offer-title">${offer.title}</span>
+            &plus;&euro;&nbsp;
+            <span class="event__offer-price">${offer.price}</span>
+          </label>
+        </div>`
+      );
+    }
+    )
+      .join('');
 
     return (
-      `<div class="event__offer-selector">
-        <input class="event__offer-checkbox  visually-hidden" id="event-offer-${offer.id}" type="checkbox" name="event-offer-${offer.id}" ${isChecked} ${isDisabled ? 'disabled' : ''}>
-        <label class="event__offer-label" for="event-offer-${offer.id}">
-          <span class="event__offer-title">${offer.title}</span>
-          &plus;&euro;&nbsp;
-          <span class="event__offer-price">${offer.price}</span>
-        </label>
-      </div>`
+      `<section class="event__section  event__section--offers">
+      <h3 class="event__section-title  event__section-title--offers">Offers</h3>
+  
+        <div class="event__available-offers">
+          ${offerElement}
+        </div>
+      </section>`
     );
   }
-  )
-    .join('');
 
-  return (
-    `<section class="event__section  event__section--offers">
-    <h3 class="event__section-title  event__section-title--offers">Offers</h3>
-
-      <div class="event__available-offers">
-        ${offerElement}
-      </div>
-    </section>`
-  );
+  return '';
 };
 
 const prepareDestinationPhoto = (photosList) => {
-  if (photosList.length === 0 || photosList === null || photosList === undefined) {
-    return '';
+  if (photosList && photosList.length > 0) {
+    const photoElement = photosList.map( (item) => (`<img class="event__photo" src="${item.src}" alt="${item.description}"></img>`))
+      .join('');
+    return (
+      `<div class="event__photos-container">
+        <div class="event__photos-tape">
+          ${photoElement}
+        </div>
+      </div>`
+    );
   }
 
-  const photoElement = photosList.map( (item) => (`<img class="event__photo" src="${item.src}" alt="${item.description}"></img>`))
-    .join('');
-  return (
-    `<div class="event__photos-container">
-      <div class="event__photos-tape">
-        ${photoElement}
-      </div>
-    </div>`
-  );
+  return '';
+};
+
+const prepareDestinationDescription = (description) => {
+  if (description) {
+    return `<p class="event__destination-description">${description}</p>`;
+  }
+
+  return '';
 };
 
 const prepareDestinationDetails = (selectedDestination) => (
   `<section class="event__section  event__section--destination">
     <h3 class="event__section-title  event__section-title--destination">Destination</h3>
-    <p class="event__destination-description">${selectedDestination.description}</p>
+    ${prepareDestinationDescription(selectedDestination.description)}
     ${prepareDestinationPhoto(selectedDestination.pictures)}
   </section>`
 );
