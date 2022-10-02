@@ -39,7 +39,6 @@ export default class TripPresenter {
   #currentSortType = SortType.DAY;
   #filterType = FilterType.EVERYTHING;
   #uiBlocker = new UiBlocker(TimeLimit.LOWER_LIMIT, TimeLimit.UPPER_LIMIT);
-  #tripInfo = null;
 
   #isLoading = true;
   #arePointsLoaded = false;
