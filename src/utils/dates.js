@@ -14,16 +14,17 @@ const getPrettyDate = (eventPeriod) => dayjs(eventPeriod).format('MMM D');
 const getPrettyTime = (eventPeriod) => dayjs(eventPeriod).format('HH:mm');
 const getPrettyDatetime = (eventPeriod) => dayjs(eventPeriod).format('DD/MM/YY HH:mm');
 
-const getCurrentDatetime = () => dayjs().format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+const getStartDatetime = (date) => dayjs(date).add(1,'h').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
+const getEndDatetime = (date) => dayjs(date).add(2,'h').format('YYYY-MM-DDTHH:mm:ss.SSS[Z]');
 
-const compareDates = (targetDate, dateToCompare, format = 'minute') => dayjs(targetDate).diff(dayjs(dateToCompare), format);
+const getDatesDifference = (targetDate, dateToCompare, format = 'minute') => dayjs(targetDate).diff(dayjs(dateToCompare), format);
 
 const areDatesEqual = (targetDate, dateToCompare) => dayjs(targetDate).isSame(dayjs(dateToCompare, 'day'));
 
-const getDatetimeDuration = (startPeriod, endPeriod) => dayjs.duration( compareDates(endPeriod, startPeriod, 'minute'), 'minutes');
+const getDatetimeDuration = (startPeriod, endPeriod) => dayjs.duration( getDatesDifference(endPeriod, startPeriod, 'minute'), 'minutes');
 
 const getFormattedDatetimeDuration = (startPeriod, endPeriod) => {
-  const minuteDifference = compareDates(endPeriod, startPeriod, 'minute');
+  const minuteDifference = getDatesDifference(endPeriod, startPeriod, 'minute');
   const datetimeDuration = dayjs.duration(minuteDifference, 'minutes');
 
   if (minuteDifference >= minuteConverter.DAY) {
@@ -44,11 +45,12 @@ export {
   getPrettyDate,
   getPrettyTime,
   getPrettyDatetime,
-  getCurrentDatetime,
+  getStartDatetime,
+  getEndDatetime,
   getDatetimeDuration,
   getFormattedDatetimeDuration,
   isPointInThePast,
   isPointInTheFuture,
-  compareDates,
+  getDatesDifference,
   areDatesEqual
 };

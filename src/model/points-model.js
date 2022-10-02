@@ -8,7 +8,7 @@ import {
   isPointInThePast,
   isPointInTheFuture,
   getDatetimeDuration,
-  compareDates
+  getDatesDifference
 } from '../utils/dates.js';
 
 import Observable from '../framework/observable.js';
@@ -27,7 +27,7 @@ const filterPoints = (points) => Object.entries(filter).map(
   }),
 );
 
-const sortPointsByDateAsc = (targetPoint, pointToCompare) => compareDates(targetPoint.dateFrom, pointToCompare.dateFrom);
+const sortPointsByDateAsc = (targetPoint, pointToCompare) => getDatesDifference(targetPoint.dateFrom, pointToCompare.dateFrom);
 
 const sortPointsByTimeDesc = (targetPoint, pointToCompare) => {
   const pointToCompareDuration = getDatetimeDuration(pointToCompare.dateFrom, pointToCompare.dateTo);
@@ -40,7 +40,6 @@ const sortPointsByPriceDesc = (targetPoint, pointToCompare) => Number(pointToCom
 export default class PointsModel extends Observable {
   #rawPoints = [];
   #filteredPoints = filter[FilterType.EVERYTHING](this.#rawPoints);
-  #pointsDefaultSortOrder = PointsModel.sortPoints;
   #pointsApiService = null;
 
   constructor (pointsApiService) {
@@ -49,7 +48,8 @@ export default class PointsModel extends Observable {
   }
 
   get points() {
-    return this.#pointsDefaultSortOrder;
+    this.#filteredPoints = this.filterPoints();
+    return this.sortPoints();
   }
 
   get filterLabels() {
@@ -67,7 +67,7 @@ export default class PointsModel extends Observable {
     this._notify(UpdateType.INIT, undefined, DataSource.POINTS);
   };
 
-  sortPoints = (sortType = sortPointsByDateAsc) => {
+  sortPoints = (sortType = SortType.DAY) => {
     switch (sortType) {
       case SortType.DAY:
         return this.#filteredPoints.sort(sortPointsByDateAsc);
@@ -78,16 +78,16 @@ export default class PointsModel extends Observable {
     }
   };
 
-  filterPoints = (filterType) => {
+  filterPoints = (filterType = FilterType.EVERYTHING) => {
     this.#filteredPoints = filter[filterType](this.#rawPoints);
     return this.#filteredPoints;
   };
 
   updatePoint = async (updateType, updatedPoint) => {
-    const index = this.#rawPoints.findIndex((task) => task.id === updatedPoint.id);
+    const index = this.#rawPoints.findIndex((point) => point.id === updatedPoint.id);
 
     if (index === -1) {
-      throw new Error('Can\'t update unexisting task');
+      throw new Error('Can\'t update unexisting point');
     }
 
     try {
@@ -117,7 +117,7 @@ export default class PointsModel extends Observable {
   };
 
   deletePoint = async (updateType, pointToDelete) => {
-    const index = this.#rawPoints.findIndex((task) => task.id === pointToDelete.id);
+    const index = this.#rawPoints.findIndex((point) => point.id === pointToDelete.id);
     if (index === -1) {
       throw new Error('Can\'t delete unexisting point');
     }
@@ -130,7 +130,7 @@ export default class PointsModel extends Observable {
       ];
       this._notify(updateType);
     } catch(err) {
-      throw new Error('Can\'t delete task');
+      throw new Error('Can\'t delete point');
     }
   };
 
