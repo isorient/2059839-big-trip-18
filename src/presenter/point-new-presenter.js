@@ -13,7 +13,7 @@ import {isEscPressed} from '../utils/common.js';
 import PointEditView from '../view/point-edit-view.js';
 
 export default class PointNewPresenter {
-  #pointListContainer = null;
+  #pointListContainerElement = null;
 
   #offers = null;
   #destinations = null;
@@ -23,8 +23,8 @@ export default class PointNewPresenter {
   #onDataChange = null;
   #destroyCallback = null;
 
-  constructor (pointListContainer, onDataChange, destroyCallback, offers, destinations) {
-    this.#pointListContainer = pointListContainer;
+  constructor (pointListContainerElement, onDataChange, destroyCallback, offers, destinations) {
+    this.#pointListContainerElement = pointListContainerElement;
     this.#onDataChange = onDataChange;
     this.#destroyCallback = destroyCallback;
     this.#offers = offers;
@@ -40,7 +40,7 @@ export default class PointNewPresenter {
     this.#pointEditComponent.setFormSubmitHandler(this.#onFormSubmit);
     this.#pointEditComponent.setDeleteClickHandler(this.#onDeleteClick);
 
-    render(this.#pointEditComponent, this.#pointListContainer, RenderPosition.AFTERBEGIN);
+    render(this.#pointEditComponent, this.#pointListContainerElement, RenderPosition.AFTERBEGIN);
 
     document.addEventListener('keydown', this.#onEscKeyDown);
   };

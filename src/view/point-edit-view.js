@@ -255,6 +255,21 @@ export default class PointEditView extends AbstractStatefulView {
     this.element.querySelector('.event__rollup-btn')?.addEventListener('click', this.#onFormClick);
   };
 
+  removeFormSubmitHandler = () => {
+    this.element.querySelector('form').removeEventListener('submit', this.#onFormSubmit);
+    this._callback.formSubmit = null;
+  };
+
+  removeDeleteClickHandler = () => {
+    this.element.querySelector('.event__reset-btn').removeEventListener('click', this.#onFormDeleteClick);
+    this._callback.deleteClick = null;
+  };
+
+  removeFormClickHandler = () => {
+    this.element.querySelector('.event__rollup-btn')?.removeEventListener('click', this.#onFormClick);
+    this._callback.formClick = null;
+  };
+
   reset = (point) => {
     this.updateElement(PointEditView.parsePointToState(point));
   };
@@ -320,7 +335,7 @@ export default class PointEditView extends AbstractStatefulView {
 
     if (datesDifference < 0) {
       this.updateElement({
-        dateTo: getEndDatetime(this._state.dateFrom),
+        dateTo: userDate,
       });
     }
 
@@ -334,7 +349,7 @@ export default class PointEditView extends AbstractStatefulView {
     const datesDifference = getDatesDifference(this._state.dateTo, this._state.dateFrom);
     if (datesDifference < 0) {
       this.updateElement({
-        dateFrom: this._state.dateTo,
+        dateFrom: userDate,
       });
     }
   };

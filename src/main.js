@@ -30,22 +30,23 @@ const filterModel = new FilterModel();
 const filterPresenter = new FilterPresenter(filterContainerElement, filterModel, pointsModel);
 const tripPresenter = new TripPresenter(tripContainerElement, pointsModel, offersModel, destinationsModel, filterModel);
 
+addPointButtonElement.disabled = true;
+
 const onNewPointFormClose = () => {
   addPointButtonElement.disabled = false;
 };
 
-const onNewPointFormClick = () => {
+const onAddPointButtonClick = () => {
   tripPresenter.createPoint(onNewPointFormClose);
   addPointButtonElement.disabled = true;
 };
-
-addPointButtonElement.addEventListener('click', onNewPointFormClick);
 
 filterPresenter.init();
 tripPresenter.init();
 pointsModel.init()
   .finally(() => {
-    addPointButtonElement.addEventListener('click', onNewPointFormClick);
+    addPointButtonElement.addEventListener('click', onAddPointButtonClick);
+    addPointButtonElement.disabled = false;
   });
 destinationsModel.init();
 offersModel.init();

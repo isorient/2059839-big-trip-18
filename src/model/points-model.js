@@ -67,7 +67,7 @@ export default class PointsModel extends Observable {
     this._notify(UpdateType.INIT, undefined, DataSource.POINTS);
   };
 
-  sortPoints = (sortType = sortPointsByDateAsc) => {
+  sortPoints = (sortType = SortType.DAY) => {
     switch (sortType) {
       case SortType.DAY:
         return this.#filteredPoints.sort(sortPointsByDateAsc);

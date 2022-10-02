@@ -17,16 +17,16 @@ const getEventSchedule = (startDate, endDate) => (
 );
 
 const getOfferItems = (point, offersData) => {
-  const offerByType = offersData.find((el) => el.type === point.type);
+  const offerByType = offersData.find((offer) => offer.type === point.type);
 
   const resultElement = point.offers.map(
     (offerId) => {
-      const lololo = offerByType.offers.find( (elem) => elem.id === offerId );
+      const availableOffer = offerByType.offers.find( (offerItem) => offerItem.id === offerId );
 
       return (`<li class="event__offer">
-        <span class="event__offer-title">${lololo.title}</span>
+        <span class="event__offer-title">${availableOffer.title}</span>
         &plus;&euro;&nbsp;
-        <span class="event__offer-price">${lololo.price}</span>
+        <span class="event__offer-price">${availableOffer.price}</span>
         </li>`);
     })
     .join('');
