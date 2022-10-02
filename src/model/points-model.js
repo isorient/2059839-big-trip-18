@@ -40,7 +40,6 @@ const sortPointsByPriceDesc = (targetPoint, pointToCompare) => Number(pointToCom
 export default class PointsModel extends Observable {
   #rawPoints = [];
   #filteredPoints = filter[FilterType.EVERYTHING](this.#rawPoints);
-  #pointsDefaultSortOrder = PointsModel.sortPoints;
   #pointsApiService = null;
 
   constructor (pointsApiService) {
@@ -49,7 +48,8 @@ export default class PointsModel extends Observable {
   }
 
   get points() {
-    return this.#pointsDefaultSortOrder;
+    this.#filteredPoints = this.filterPoints();
+    return this.sortPoints();
   }
 
   get filterLabels() {
@@ -78,7 +78,7 @@ export default class PointsModel extends Observable {
     }
   };
 
-  filterPoints = (filterType) => {
+  filterPoints = (filterType = FilterType.EVERYTHING) => {
     this.#filteredPoints = filter[filterType](this.#rawPoints);
     return this.#filteredPoints;
   };
