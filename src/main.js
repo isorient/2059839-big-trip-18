@@ -28,7 +28,7 @@ const destinationsModel = new DestinationsModel(destinationsApiService);
 const filterModel = new FilterModel();
 
 const filterPresenter = new FilterPresenter(filterContainerElement, filterModel, pointsModel);
-const tripPresenter = new TripPresenter(tripContainerElement, pointsModel, offersModel, destinationsModel, filterModel);
+const tripPresenter = new TripPresenter(tripContainerElement, tripInfoContainerElement, pointsModel, offersModel, destinationsModel, filterModel);
 
 addPointButtonElement.disabled = true;
 
