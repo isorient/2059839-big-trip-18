@@ -4,8 +4,8 @@ import AbstractView from '../framework/view/abstract-view.js';
 
 const NoPointsTextType = {
   [FilterType.EVERYTHING]: 'Click New Event to create your first point',
-  [FilterType.PAST]: 'There are no past events',
-  [FilterType.FUTURE]: 'There are no future',
+  [FilterType.PAST]: 'There are no past events now',
+  [FilterType.FUTURE]: 'There are no future events now',
 };
 
 const createPointEmptyListTemplate = (filterType) => `<p class="trip-events__msg">${NoPointsTextType[filterType]}</p>`;

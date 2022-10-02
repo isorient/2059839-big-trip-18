@@ -22,6 +22,7 @@ import PointListView from '../view/point-list-view.js';
 
 import PointPresenter from './point-presenter.js';
 import PointNewPresenter from './point-new-presenter.js';
+import TripInfoPresenter from './trip-info-presenter.js';
 
 export default class TripPresenter {
   #pointsModel = null;
@@ -30,6 +31,7 @@ export default class TripPresenter {
   #filterModel = null;
 
   #tripContainerElement = null;
+  #tripInfoContainerElement = null;
 
   #loadingComponent = new LoadingView();
   #sortComponent = null;
@@ -47,9 +49,11 @@ export default class TripPresenter {
 
   #pointPresenter = new Map();
   #pointNewPresenter = null;
+  #tripInfoPresenter = null;
 
-  constructor (tripContainerElement, pointsModel, offersModel, destinationsModel, filterModel) {
+  constructor (tripContainerElement, tripInfoContainerElement, pointsModel, offersModel, destinationsModel, filterModel) {
     this.#tripContainerElement = tripContainerElement;
+    this.#tripInfoContainerElement = tripInfoContainerElement;
 
     this.#pointsModel = pointsModel;
     this.#offersModel = offersModel;
@@ -123,6 +127,20 @@ export default class TripPresenter {
     points.forEach((point) => this.#renderPoint(point, offers, destinations));
   };
 
+  #renderTripInfo = () => {
+    if (this.#tripInfoPresenter) {
+      this.#tripInfoPresenter.destroy();
+    }
+
+    this.#tripInfoPresenter = new TripInfoPresenter(this.#tripInfoContainerElement);
+
+    this.#tripInfoPresenter.init(
+      this.#pointsModel.points,
+      this.#offersModel.offers,
+      this.#destinationsModel.destinations
+    );
+  };
+
   #renderTripBoard = () => {
     if (this.#isLoading) {
       this.#renderLoading();
@@ -137,6 +155,7 @@ export default class TripPresenter {
     render(this.#pointListComponent, this.#tripContainerElement);
     this.#renderPoints(this.points, this.#offersModel.offers, this.#destinationsModel.destinations);
     this.#renderSort();
+    this.#renderTripInfo();
   };
 
   #clearTripBoard = ({resetSortType = false} = {}) => {
@@ -149,6 +168,11 @@ export default class TripPresenter {
 
     remove(this.#sortComponent);
     remove(this.#loadingComponent);
+
+    if (this.#tripInfoPresenter) {
+      this.#tripInfoPresenter.destroy();
+      this.#tripInfoPresenter = null;
+    }
 
     if (this.#pointEmptyListComponent) {
       remove(this.#pointEmptyListComponent);
@@ -231,7 +255,9 @@ export default class TripPresenter {
   #onModelChange = (updateType, updatedPoint, modelName) => {
     switch (updateType) {
       case UpdateType.PATCH:
-        return this.#pointPresenter.get(updatedPoint.id).init(updatedPoint, this.#offersModel.offers, this.#destinationsModel.destinations);
+        this.#pointPresenter.get(updatedPoint.id).init(updatedPoint, this.#offersModel.offers, this.#destinationsModel.destinations);
+        this.#renderTripInfo();
+        break;
       case UpdateType.MINOR:
         this.#clearTripBoard();
         this.#renderTripBoard();
