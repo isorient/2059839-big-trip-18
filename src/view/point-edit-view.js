@@ -329,7 +329,7 @@ export default class PointEditView extends AbstractStatefulView {
         enableTime: true,
         'time_24hr': true,
         dateFormat: 'd/m/y H:i',
-        defaultDate: this._state.date,
+        defaultDate: this._state.dateTo,
         onClose: this.#onEndDateChange,
       },
     );
