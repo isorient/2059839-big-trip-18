@@ -300,6 +300,7 @@ export default class PointEditView extends AbstractStatefulView {
     this.#setInnerHandlers();
     this.#setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
     this.setFormClickHandler(this._callback.formClick);
   };
 

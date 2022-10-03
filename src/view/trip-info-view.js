@@ -1,18 +1,19 @@
 import AbstractView from '../framework/view/abstract-view.js';
 import {getPrettyDate} from '../utils/dates.js';
 
+const MAX_CITIES_NUM = 3;
+
 const getThirdCity = (route) => {
   let thirdCity = null;
 
   route.tripCities.forEach((city) => {
-    thirdCity = (city !== route.firstCity || city !== route.lastCity) ? city : thirdCity;
+    thirdCity = (city !== route.firstCity && city !== route.lastCity) ? city : thirdCity;
   });
-
   return thirdCity;
 };
 
 const createTripInfoTemplate = (tripInfo) => {
-  const routeThirdCity = (tripInfo.route.tripCities.length === 3) ? getThirdCity(tripInfo.route) : '...';
+  const routeThirdCity = (tripInfo.route.tripCities.length === MAX_CITIES_NUM) ? getThirdCity(tripInfo.route) : '...';
 
   return (
     `<section class="trip-main__trip-info  trip-info">

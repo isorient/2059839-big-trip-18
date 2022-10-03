@@ -128,6 +128,10 @@ export default class TripPresenter {
   };
 
   #renderTripInfo = () => {
+    if (this.#pointsModel.points.length === 0) {
+      return;
+    }
+
     if (this.#tripInfoPresenter) {
       this.#tripInfoPresenter.destroy();
     }
@@ -147,6 +151,8 @@ export default class TripPresenter {
       return;
     }
 
+    this.#renderTripInfo();
+
     if (this.points.length === 0) {
       this.#renderPointEmptyList();
       return;
@@ -155,7 +161,6 @@ export default class TripPresenter {
     render(this.#pointListComponent, this.#tripContainerElement);
     this.#renderPoints(this.points, this.#offersModel.offers, this.#destinationsModel.destinations);
     this.#renderSort();
-    this.#renderTripInfo();
   };
 
   #clearTripBoard = ({resetSortType = false} = {}) => {
