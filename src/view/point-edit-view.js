@@ -300,6 +300,7 @@ export default class PointEditView extends AbstractStatefulView {
     this.#setInnerHandlers();
     this.#setDatepicker();
     this.setFormSubmitHandler(this._callback.formSubmit);
+    this.setDeleteClickHandler(this._callback.deleteClick);
     this.setFormClickHandler(this._callback.formClick);
   };
 
@@ -318,7 +319,7 @@ export default class PointEditView extends AbstractStatefulView {
         'time_24hr': true,
         dateFormat: 'd/m/y H:i',
         defaultDate: this._state.dateFrom,
-        onClose: this.#onStartDateChange,
+        onChange: this.#onStartDateChange,
       },
     );
 
@@ -328,8 +329,8 @@ export default class PointEditView extends AbstractStatefulView {
         enableTime: true,
         'time_24hr': true,
         dateFormat: 'd/m/y H:i',
-        defaultDate: this._state.dateTo,
-        onClose: this.#onEndDateChange,
+        defaultDate: this._state.date,
+        onChange: this.#onEndDateChange,
       },
     );
   };
